@@ -1,0 +1,28 @@
+{
+  "name": "dce-paella-extensions",
+  "version": "1.0.0",
+  "description": "Harvard DCE Extensions for the Paella video player",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jimkang/dce-paella-extensions.git"
+  },
+  "keywords": [
+    "video",
+    "player",
+    "education"
+  ],
+  "author": "Harvard DCE",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jimkang/dce-paella-extensions/issues"
+  },
+  "homepage": "https://github.com/jimkang/dce-paella-extensions",
+  "devDependencies": {
+    "tape": "^3.0.3"
+  },
+  "dependencies": {}
+}
