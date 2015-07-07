@@ -14,7 +14,7 @@ Usage
 -----
 
     cd node_modules/dce-paella
-    make copy-to-parent
+    make copy-to-paella PAELLA-DIR=<location of the Paella git repository>
 
 DCE modifications not installed by this package
 -----------------------------------------------
