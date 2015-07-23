@@ -13,8 +13,7 @@ Installation
 Usage
 -----
 
-    cd node_modules/dce-paella
-    make copy-to-paella PAELLA-DIR=<location of the Paella git repository>
+You need to copy your stuff out of this module to where you need it yourself. Sorry. The DCE fork of paella-matterhorn does it in the `copy-extensions-to-paella` target of its [Makefile](https://github.com/harvard-dce/paella-matterhorn/blob/using-upstream-paella-directly/Makefile).
 
 DCE modifications not installed by this package
 -----------------------------------------------
