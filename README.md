@@ -15,6 +15,15 @@ Usage
 
 You need to copy your stuff out of this module to where you need it yourself. Sorry. The DCE fork of paella-matterhorn does it in the `copy-extensions-to-paella` target of its [Makefile](https://github.com/harvard-dce/paella-matterhorn/blob/using-upstream-paella-directly/Makefile).
 
+Development
+-----------
+
+To avoid having to run `npm publish` and `npm install` just to see if a change worked in the context of paella-matterhorn, you can:
+
+- Run `npm link` (with sudo if your global node_modules is in a place that requires it) from this repo's directory.
+- Run `npm link dce-paella-extensions` in the paella-matterhorn directory. Now there will be a symlink-like link to the project.
+- Then, run `grunt build.debug` in paella-matterhorn.
+
 DCE modifications not installed by this package
 -----------------------------------------------
 
