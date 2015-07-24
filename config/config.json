@@ -99,7 +99,7 @@
         "enabled": true
       },
       "es.upv.paella.helpPlugin": {
-        "enabled": true,
+        "enabled": false,
         "langs": [
           "en",
           "es"
@@ -139,6 +139,9 @@
       },
       "es.upv.paella.frameControlPlugin": {
         "enabled":true
+      },
+      "edu.harvard.dce.paella.infoPlugin": {
+        "enabled": true
       }
     }
   },
