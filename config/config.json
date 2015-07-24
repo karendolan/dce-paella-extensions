@@ -136,6 +136,9 @@
       },
       "es.upv.paella.playButtonOnScreenPlugin": {
         "enabled": true
+      },
+      "es.upv.paella.frameControlPlugin": {
+        "enabled":true
       }
     }
   },
