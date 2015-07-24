@@ -45,8 +45,8 @@
       "enabled": true
     },
     "list": {
-      "ch.ethz.paella.multipleQualitiesPlugin": {
-        "enabled": false
+      "es.upv.paella.multipleQualitiesPlugin": {
+        "enabled": true
       },
       "es.upv.paella.ImageControlPlugin": {
         "enabled": false
@@ -95,7 +95,7 @@
       "es.upv.paella.footprintsPlugin": {
         "enabled": false
       },
-      "es.upv.paella.playbackRate": {
+      "es.upv.paella.playbackRatePlugin": {
         "enabled": true
       },
       "es.upv.paella.helpPlugin": {
