@@ -87,7 +87,7 @@
         "direction": "Rewind",
         "seconds": 10
       },
-      "edu.harvard.dce.paella.flexSkipPluginForward": {
+      "edu.harvard.dce.paella.flexSkipForwardPlugin": {
         "enabled": true,
         "direction": "Forward",
         "seconds": 30
