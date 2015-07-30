@@ -1,4 +1,8 @@
 Class ("paella.plugins.Add2xPlaybackChoice",paella.EventDrivenPlugin,{
+  getName: function () {
+    return 'edu.harvard.dce.paella.add2xPlaybackChoice';
+  },
+
   getEvents: function() {
     return [paella.events.loadPlugins];
   },
