@@ -142,6 +142,12 @@
       },
       "edu.harvard.dce.paella.infoPlugin": {
         "enabled": true
+      },
+      "edu.harvard.dce.paella.autoHeaderHidePlugin": {
+          "enabled": true
+      },
+      "edu.harvard.dce.paella.autoTitlePlugin": {
+          "enabled": true
       }
     }
   },
