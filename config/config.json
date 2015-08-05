@@ -154,7 +154,13 @@
       },
       "edu.harvard.dce.paella.add2xPlaybackChoice": {
         "enabled": true
-      }       
+      },
+      "es.upv.paella.liveStramingIndicatorPlugin": {
+        "enabled": true
+      },
+      "edu.harvard.dce.paella.resizeLiveStream": {
+        "enabled": true
+      }
     }
   },
   "standalone": {

@@ -1,4 +1,7 @@
 Class ("paella.plugins.ResizeLiveStream",paella.EventDrivenPlugin,{
+  getName: function() {
+    return "edu.harvard.dce.paella.resizeLiveStream";
+  },
 
   setup: function() {
     if (paella.player.isLiveStream()){
