@@ -17,17 +17,17 @@ Class ("paella.plugins.ResizeLiveStream",paella.EventDrivenPlugin,{
   },
 
   resizeStreamingContainer: function() {
-    var optimalWidth;
+   var optimalWidth;
     var optimalHeight;
     var videoContainer = $('#playerContainer_videoContainer_container');
 
     var containerWidth = videoContainer.width();
     var containerHeight = videoContainer.height();
-    var streamHeight = paella.player.videoContainer.masterVideo().resHeight;
-    var streamWidth = paella.player.videoContainer.masterVideo().resWidth;
 
-    var newMaxHeight = (containerWidth * streamHeight) / streamWidth;
-    var newMaxWidth = (streamWidth * containerHeight) / streamHeight;
+    var streamRes = paella.player.videoContainer.currentMasterVideoData.res;
+
+    var newMaxWidth = (streamRes.w * containerHeight) / streamRes.h;
+    var newMaxHeight = (containerWidth * streamRes.h) / streamRes.w;
 
     if(newMaxWidth > containerWidth) {
       optimalWidth = containerWidth;
