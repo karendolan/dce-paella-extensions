@@ -1,20 +1,6 @@
 /**
- *      <header id="dceHeader">
-<div class="primary">
-<a href="//www.extension.harvard.edu" title="Harvard Extension School" tabindex="-1" lid="extensionHome"></a>
-</div>
-<div class="secondary">
-<a href="//www.extension.harvard.edu/help/privacy-policy" id="privacyPolicy">Privacy</a> ::
-<a href="//www.extension.harvard.edu/open-learning-initiative/terms-of-use" id="terms">Terms of Use</a> ::
-<span id="copyright">&copy; 2014 President and Fellows of Harvard College</span>
-</div>
-</header>
-
-'<a href="//www.extension.harvard.edu/help/privacy-policy" id="privacyPolicy">Privacy</a> :: ' +
-'<a href="//www.extension.harvard.edu/open-learning-initiative/terms-of-use" id="terms">Terms of Use</a> :: ' +
-'<span id="copyright">&copy; 2014 President and Fellows of Harvard College</span>',
-
-
+ * Purpose: To display the appropriate Harvard school banner for the recording
+ * Default banner is the Harvard Extension school
  */
 Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
   getName: function () {
@@ -63,8 +49,7 @@ Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
   // Default School
   _dceBannerSchool: 'Harvard Extension School',
   
-  _templateData: {
-  },
+  _templateData: {},
   
   _toggleBannerNode: function () {
     try {
@@ -83,9 +68,7 @@ Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
         abbreviated: this._dceBannerMap[ this._dceBannerSchool].abbreviated
       };
       
-      // TODO:
-      // Insert here hiding the header & removing the default header
-      // Change the class name
+      // This assumes an element with Id dceHeader in the watch.html
       jQuery('#dceHeader').attr("class", this._dceBannerMap[ this._dceBannerSchool].shortId);
       jQuery('#dceHeader .primary').empty();
       jQuery('#dceHeader .primary').jqoteapp(this._primaryTemplate, this._templateData);
