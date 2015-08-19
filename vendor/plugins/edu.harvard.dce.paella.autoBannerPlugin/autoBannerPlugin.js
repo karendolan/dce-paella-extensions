@@ -13,6 +13,9 @@ Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
     paella.events.singleVideoReady];
   },
   
+  // only perform once
+  _isBannerUpdated: false,
+
   // delete if using embedded watch.html template
   _primaryTemplate:
   '<a href="<%= this.href %>" title="<%= this.school %>" tabindex="-1" id="<%= this.schooltag %>Home"></a>',
@@ -50,8 +53,20 @@ Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
   _dceBannerSchool: 'Harvard Extension School',
   
   _templateData: {},
+
+  _fillInTemplate: function(template, data) {
+    var result = template.slice();
+    for (var key in data) {
+        var replacement = '<%= this.' + key + ' %>';
+        result = result.replace(new RegExp(replacement, 'g'), data[key]);
+    }
+    return result;
+  },
   
   _toggleBannerNode: function () {
+    if (this._isBannerUpdated) {
+        return false;
+     }
     try {
       var today = new Date();
       var copyYear = today.getUTCFullYear();
@@ -70,15 +85,15 @@ Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
       
       // This assumes an element with Id dceHeader in the watch.html
       jQuery('#dceHeader').attr("class", this._dceBannerMap[ this._dceBannerSchool].schooltag);
-      jQuery('#dceHeader .primary').empty();
-      jQuery('#dceHeader .primary').jqoteapp(this._primaryTemplate, this._templateData);
-      jQuery('#dceHeader .secondary').empty();
-      jQuery('#dceHeader .secondary').jqoteapp(this._secondaryTemplate, this._templateData);
+      // Replace existing banner parts with the updates
+      jQuery('#dceHeader .primary').empty().append(this._fillInTemplate(this._primaryTemplate, this._templateData));
+      jQuery('#dceHeader .secondary').empty().append(this._fillInTemplate(this._secondaryTemplate, this._templateData));
       // now show the header
       jQuery('#dceHeader').animate({
         top: '0px'
       },
       1000);
+      this._isBannerUpdated = true;
     }
     catch (err) {
       console.log(err.stack);
