@@ -15,7 +15,7 @@ Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
   
   // delete if using embedded watch.html template
   _primaryTemplate:
-  '<a href="<%= this.href %>" title="<%= this.school %>" tabindex="-1" id="<%= this.shortId %>Home"></a>',
+  '<a href="<%= this.href %>" title="<%= this.school %>" tabindex="-1" id="<%= this.schooltag %>Home"></a>',
   
   _secondaryTemplate:
   '<a href="<%= this.privacy %>" id="privacyPolicy">Privacy</a> :: ' +
@@ -27,21 +27,21 @@ Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
       school: "Harvard Extension School",
       href: "//www.extension.harvard.edu",
       privacy: "//www.extension.harvard.edu/help/privacy-policy",
-      shortId: "extension",
+      schooltag: "extension",
       abbreviated: "ext"
     },
     "Harvard Summer School": {
       school: "Harvard Summer School",
       href: "//www.summer.harvard.edu",
       privacy: "//www.summer.harvard.edu/help/privacy-policy",
-      shortId: "summer",
+      schooltag: "summer",
       abbreviated: "sum"
     },
     "Harvard Faculty of Arts and Sciences": {
       school: "Harvard Faculty of Arts and Sciences",
       href: "//www.fas.harvard.edu",
       privacy: "//www.extension.harvard.edu/help/privacy-policy",
-      shortId: "fas",
+      schooltag: "fas",
       abbreviated: "fas"
     }
   },
@@ -56,7 +56,7 @@ Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
       var today = new Date();
       var copyYear = today.getUTCFullYear();
       var dcObj = paella.matterhorn.serie[ 'http://purl.org/dc/terms/'];
-      if (dcObj && dcObj.creator && dcObj.creator[0].value) {
+      if (dcObj && dcObj.creator && dcObj.creator.length > 0) {
         this._dceBannerSchool = dcObj.creator[0].value;
       }
       this._templateData = {
@@ -64,12 +64,12 @@ Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
         school: this._dceBannerMap[ this._dceBannerSchool].school,
         href: this._dceBannerMap[ this._dceBannerSchool].href,
         privacy: this._dceBannerMap[ this._dceBannerSchool].privacy,
-        shortId: this._dceBannerMap[ this._dceBannerSchool].shortId,
+        schooltag: this._dceBannerMap[ this._dceBannerSchool].schooltag,
         abbreviated: this._dceBannerMap[ this._dceBannerSchool].abbreviated
       };
       
       // This assumes an element with Id dceHeader in the watch.html
-      jQuery('#dceHeader').attr("class", this._dceBannerMap[ this._dceBannerSchool].shortId);
+      jQuery('#dceHeader').attr("class", this._dceBannerMap[ this._dceBannerSchool].schooltag);
       jQuery('#dceHeader .primary').empty();
       jQuery('#dceHeader .primary').jqoteapp(this._primaryTemplate, this._templateData);
       jQuery('#dceHeader .secondary').empty();
@@ -81,7 +81,7 @@ Class ("paella.plugins.AutoBannerPlugin", paella.EventDrivenPlugin, {
       1000);
     }
     catch (err) {
-      console.log(err.message);
+      console.log(err.stack);
     }
   },
   
