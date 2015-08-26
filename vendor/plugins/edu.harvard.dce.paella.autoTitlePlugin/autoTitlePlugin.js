@@ -4,7 +4,7 @@ Class ("paella.plugins.AutoTitlePlugin", paella.EventDrivenPlugin, {
   },
 
   getEvents: function(){
-    return [paella.events.loadPlugins];
+    return [paella.events.loadPlugins, paella.events.singleVideoReady];
   },
 
   _createSeriesTitleNode: function(){
