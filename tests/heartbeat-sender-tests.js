@@ -14,7 +14,11 @@ var mockPaellaObject = {
   EventDrivenPlugin: '',
   plugins: {},
   player: {
-    videoIdentifier: 'the-video-identifier'
+    videoIdentifier: 'the-video-identifier',
+    videoContainer: {
+      currentTime: mockCurrentTime,
+      trimStart: mockTrimStart
+    }
   },
   matterhorn: {
     resourceId: '/2015/03/33383/L10'
@@ -22,7 +26,7 @@ var mockPaellaObject = {
 };
 
 test('Heartbeat test', function heartbeatTest(t) {
-  t.plan(9);
+  t.plan(12);
 
   // Set up mocks and checks.
   setUpMocks();
@@ -83,18 +87,25 @@ function setUpAssertingMocks(t) {
       mockPaellaObject.player.videoIdentifier,
       'id query param is set to the value of paella.player.videoIdentifier.'
     );
-    // t.equal(urlParts.query.in, 0, 'in query param is set to 0.');
-    // t.equal(urlParts.query.out, 0, 'in query param is set to 0.');
-
+    t.equal(
+      urlParts.query.type, 'HEARTBEAT', 'type query param is correct.'
+    );
+    t.equal(
+      parseInt(urlParts.query.in, 10),
+      mockCurrentTime() + mockTrimStart(),
+      '"in" query param is set to currentTime + trimStart.'
+    );
+    t.equal(
+      parseInt(urlParts.query.out, 10),
+      mockCurrentTime() + mockTrimStart(),
+      '"out" query param is also set to currentTime + trimStart.'
+    );
     t.equal(
       urlParts.query.resource,
       mockPaellaObject.matterhorn.resourceId,
       'resource query param is set to the value of paella.matterhorn.resourceId.'
     );
-    debugger;
-
   }
-
 }
 
 // opts is not a required parameter. But if you do specify it, here's an example
@@ -135,3 +146,12 @@ function setUpMocks(opts) {
     }
   };
 }
+
+function mockCurrentTime() {
+  return 300;
+}
+
+function mockTrimStart() {
+  return 200;
+}
+

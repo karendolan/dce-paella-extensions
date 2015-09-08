@@ -25,6 +25,12 @@ var classDef = {
     }
 
     function getHeartbeatURL() {
+      var videoCurrentTime = parseInt(
+        paella.player.videoContainer.currentTime() +
+        paella.player.videoContainer.trimStart(),
+        10
+      );
+
       var url = 'https://';
       url += location.host + '/';
       url += 'usertracking/?';
@@ -32,8 +38,8 @@ var classDef = {
         _method: 'PUT',
         id: paella.player.videoIdentifier,
         type: 'HEARTBEAT',
-        in: 0,
-        out: 0,
+        in: videoCurrentTime,
+        out: videoCurrentTime,
         playing: false,
         resource: paella.matterhorn.resourceId,
         _: 1441381319430
