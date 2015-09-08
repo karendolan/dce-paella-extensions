@@ -1,6 +1,6 @@
 {
   "name": "dce-paella-extensions",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Harvard DCE Extensions for the Paella video player",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,9 @@
   },
   "homepage": "https://github.com/jimkang/dce-paella-extensions",
   "devDependencies": {
-    "tape": "^3.0.3"
+    "call-next-tick": "^1.1.2",
+    "lodash": "^3.10.1",
+    "tape": "^4.2.0"
   },
   "dependencies": {}
 }

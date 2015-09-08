@@ -1,5 +1,5 @@
 test:
-	node tests/basictests.js
+	node tests/heartbeat-sender-tests.js
 
 pushall:
 	git push origin master && npm publish
