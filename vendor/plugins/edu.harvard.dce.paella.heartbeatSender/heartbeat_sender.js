@@ -51,7 +51,7 @@ var classDef = {
 
     function queryStringFromDict(dict) {
       var qs = '';
-      for (key in dict) {
+      for (var key in dict) {
         if (qs.length > 0) {
           qs += '&';
         }
