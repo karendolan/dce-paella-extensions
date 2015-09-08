@@ -17,7 +17,8 @@ var mockPaellaObject = {
     videoIdentifier: 'the-video-identifier',
     videoContainer: {
       currentTime: mockCurrentTime,
-      trimStart: mockTrimStart
+      trimStart: mockTrimStart,
+      paused: mockPaused
     }
   },
   matterhorn: {
@@ -26,7 +27,7 @@ var mockPaellaObject = {
 };
 
 test('Heartbeat tests', function heartbeatTests(t) {
-  t.plan(13);
+  t.plan(14);
 
   // Set up mocks and checks.
   setUpMocks();
@@ -113,6 +114,12 @@ function setUpAssertingMocks(t) {
       'object',
       'The timestamp ("_") query param is a valid date.'
     );
+
+    t.equal(
+      query.playing,
+      'true',
+      'The playing query param should be set to the string "true".'
+    );
   }
 }
 
@@ -163,3 +170,6 @@ function mockTrimStart() {
   return 200;
 }
 
+function mockPaused() {
+  return false;
+}

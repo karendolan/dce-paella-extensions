@@ -39,7 +39,7 @@ var classDef = {
         type: 'HEARTBEAT',
         in: videoCurrentTime,
         out: videoCurrentTime,
-        playing: false,
+        playing: !paella.player.videoContainer.paused(),
         resource: paella.matterhorn.resourceId,
         _: (new Date()).getTime()
       });
