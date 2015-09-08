@@ -75,7 +75,7 @@
         "showMasterVolume": true,
         "showSlaveVolume": false
       },
-      "es.upv.paella.userTrackingCollectorPlugIn": {
+      "edu.harvard.dce.paella.heartbeatSender": {
         "enabled": true,
         "heartBeatTime": 5000
       },
