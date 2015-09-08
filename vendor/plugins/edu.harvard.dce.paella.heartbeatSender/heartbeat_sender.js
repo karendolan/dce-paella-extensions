@@ -19,7 +19,6 @@ var classDef = {
     }
 
     function registerHeartbeat(timer) {
-      // thisClass.registerEvent('HEARTBEAT'); 
       var xhr = new XMLHttpRequest();
       xhr.open('GET', getHeartbeatURL());
     }
@@ -42,9 +41,10 @@ var classDef = {
         out: videoCurrentTime,
         playing: false,
         resource: paella.matterhorn.resourceId,
-        _: 1441381319430
+        _: (new Date()).getTime()
       });
 
+      // Example heartbeat URL:
       // https://localhost:3000/_method=PUT&id=74b6c02f-afbb-42bc-8145-344153a1792e&type=HEARTBEAT&in=0&out=0&playing=false&resource=%2F2015%2F03%2F33383%2FL10&_=1441381319430'
       return url;
     }

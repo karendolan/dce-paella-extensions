@@ -25,8 +25,8 @@ var mockPaellaObject = {
   }
 };
 
-test('Heartbeat test', function heartbeatTest(t) {
-  t.plan(12);
+test('Heartbeat tests', function heartbeatTests(t) {
+  t.plan(13);
 
   // Set up mocks and checks.
   setUpMocks();
@@ -77,33 +77,41 @@ function setUpAssertingMocks(t) {
 
   function checkHeartbeatURL(URL) {
     var urlParts = url.parse(URL, true);
+    var query = urlParts.query;
+
     t.equal(urlParts.protocol, 'https:', 'Request is sent via https.');
     t.equal(urlParts.pathname, '/usertracking/', 'Request pathname is correct.');
+
     t.equal(
-      urlParts.query._method, 'PUT', 'Sends "PUT" as the "_method" query param.'
+      query._method, 'PUT', 'Sends "PUT" as the "_method" query param.'
     );
     t.equal(
-      urlParts.query.id,
+      query.id,
       mockPaellaObject.player.videoIdentifier,
       'id query param is set to the value of paella.player.videoIdentifier.'
     );
+    t.equal(query.type, 'HEARTBEAT', 'type query param is correct.');
     t.equal(
-      urlParts.query.type, 'HEARTBEAT', 'type query param is correct.'
-    );
-    t.equal(
-      parseInt(urlParts.query.in, 10),
+      parseInt(query.in, 10),
       mockCurrentTime() + mockTrimStart(),
       '"in" query param is set to currentTime + trimStart.'
     );
     t.equal(
-      parseInt(urlParts.query.out, 10),
+      parseInt(query.out, 10),
       mockCurrentTime() + mockTrimStart(),
       '"out" query param is also set to currentTime + trimStart.'
     );
     t.equal(
-      urlParts.query.resource,
+      query.resource,
       mockPaellaObject.matterhorn.resourceId,
       'resource query param is set to the value of paella.matterhorn.resourceId.'
+    );
+
+    var timestamp = new Date(query._);
+    t.equal(
+      typeof timestamp,
+      'object',
+      'The timestamp ("_") query param is a valid date.'
     );
   }
 }
