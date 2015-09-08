@@ -27,7 +27,7 @@ var mockPaellaObject = {
 };
 
 test('Heartbeat tests', function heartbeatTests(t) {
-  t.plan(14);
+  t.plan(15);
 
   // Set up mocks and checks.
   setUpMocks();
@@ -68,12 +68,17 @@ function setUpAssertingMocks(t) {
 
   function mockXHR() {
     this.open = mockOpen;
+    this.send = mockSend;
   }
 
   function mockOpen(method, URL) {
     t.equal(method, 'GET', 'Opens a request with the GET method.');
     // t.equal(URL, )
     checkHeartbeatURL(URL);
+  }
+
+  function mockSend() {
+    t.pass('The xhr is actually sent.');
   }
 
   function checkHeartbeatURL(URL) {

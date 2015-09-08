@@ -21,6 +21,7 @@ var classDef = {
     function registerHeartbeat(timer) {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', getHeartbeatURL());
+      xhr.send();
     }
 
     function getHeartbeatURL() {
