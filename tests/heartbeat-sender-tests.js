@@ -1,31 +1,43 @@
 var test = require('tape');
 var _ = require('lodash');
 var callNextTick = require('call-next-tick');
+var url = require('url');
+
+// !! These tests require global mocks. If they need to be run in the same  
+// process as another test in the future, teardowns need to be added.
 
 var mockConfig = {
   heartBeatTime: 100          
 };
 
+var mockPaellaObject = {
+  EventDrivenPlugin: '',
+  plugins: {},
+  player: {
+    videoIdentifier: 'the-video-identifier'
+  },
+  matterhorn: {
+    resourceId: '/2015/03/33383/L10'
+  }
+};
+
 test('Heartbeat test', function heartbeatTest(t) {
-  t.plan(4);
+  t.plan(9);
 
   // Set up mocks and checks.
-  setUpTopLevelGlobalMocks({
-    classMethods: {
-      registerEvent: mockRegisterEvent
-    }
-  });
-  setUpAssertingMocks();
+  setUpMocks();
+  setUpAssertingMocks(t);
 
 
   // Loading the plugin code actually executes the plugin.
   // That is how Paella plugins work.
   require('../vendor/plugins/edu.harvard.dce.paella.heartbeatSender/heartbeat_sender');
 
+});
 
-  function setUpAssertingMocks() {
-    global.base.Timer = timer;
-  }
+function setUpAssertingMocks(t) {
+  global.base.Timer = timer;
+  global.XMLHttpRequest = mockXHR;
 
   function timer(callback, time, params) {
     t.equal(
@@ -49,11 +61,41 @@ test('Heartbeat test', function heartbeatTest(t) {
     }
   }
 
-  function mockRegisterEvent(eventName) {
-    t.equal(eventName, 'HEARTBEAT', 'The heartbeat event is registered.');
+  function mockXHR() {
+    this.open = mockOpen;
   }
-});
 
+  function mockOpen(method, URL) {
+    t.equal(method, 'GET', 'Opens a request with the GET method.');
+    // t.equal(URL, )
+    checkHeartbeatURL(URL);
+  }
+
+  function checkHeartbeatURL(URL) {
+    var urlParts = url.parse(URL, true);
+    t.equal(urlParts.protocol, 'https:', 'Request is sent via https.');
+    t.equal(urlParts.pathname, '/usertracking/', 'Request pathname is correct.');
+    t.equal(
+      urlParts.query._method, 'PUT', 'Sends "PUT" as the "_method" query param.'
+    );
+    t.equal(
+      urlParts.query.id,
+      mockPaellaObject.player.videoIdentifier,
+      'id query param is set to the value of paella.player.videoIdentifier.'
+    );
+    // t.equal(urlParts.query.in, 0, 'in query param is set to 0.');
+    // t.equal(urlParts.query.out, 0, 'in query param is set to 0.');
+
+    t.equal(
+      urlParts.query.resource,
+      mockPaellaObject.matterhorn.resourceId,
+      'resource query param is set to the value of paella.matterhorn.resourceId.'
+    );
+    debugger;
+
+  }
+
+}
 
 // opts is not a required parameter. But if you do specify it, here's an example
 // of what is expected:
@@ -63,11 +105,12 @@ test('Heartbeat test', function heartbeatTest(t) {
 //    otherMethod: function myOtherFn() { ... }
 //  }
 // }
-function setUpTopLevelGlobalMocks(opts) {
-  global.paella = {
-    EventDrivenPlugin: '',
-    plugins: {}
+function setUpMocks(opts) {
+  global.location = {
+    host: 'test-server'
   };
+
+  global.paella = _.cloneDeep(mockPaellaObject);
 
   global.base = {};
 
