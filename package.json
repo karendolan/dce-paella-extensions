@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:jimkang/dce-paella-extensions.git"
+    "url": "git@github.com:harvard-dce/dce-paella-extensions.git"
   },
   "keywords": [
     "video",
@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/jimkang/dce-paella-extensions/issues"
   },
-  "homepage": "https://github.com/jimkang/dce-paella-extensions",
+  "homepage": "https://github.com/harvard-dce/dce-paella-extensions",
   "devDependencies": {
     "call-next-tick": "^1.1.2",
     "lodash": "^3.10.1",
