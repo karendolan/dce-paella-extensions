@@ -8,7 +8,15 @@ It is not a standard Node or browser module (as of now), but rather, a way to pa
 Installation
 ------------
 
+When using as a dependency in another project:
+
     npm install dce-paella-extensions
+
+When working on this module:
+
+    git clone git@github.com:harvard-dce/dce-paella-extensions
+    git checkout <branch name>
+    npm install
 
 Usage
 -----
@@ -17,6 +25,14 @@ You need to copy your stuff out of this module to where you need it yourself. So
 
 Development
 -----------
+
+**Local development**
+
+- Edit the files you want.
+- Run tests as documented in the next section.
+- When you are ready to publish to NPM, make sure you update the version in package.json.
+
+**Testing a development version of this module in paella-matterhorn**
 
 To avoid having to run `npm publish` and `npm install` just to see if a change worked in the context of paella-matterhorn, you can:
 
