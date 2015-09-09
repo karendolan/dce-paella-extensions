@@ -77,7 +77,7 @@
       },
       "edu.harvard.dce.paella.heartbeatSender": {
         "enabled": true,
-        "heartBeatTime": 5000
+        "heartBeatTime": 30000
       },
       "es.upv.paella.matterhorn.userTrackingSaverPlugIn": {
         "enabled": true
