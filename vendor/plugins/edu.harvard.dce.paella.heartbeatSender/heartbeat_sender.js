@@ -68,6 +68,6 @@ Class(
     }
   }
   // End class definition.
-});
+);
 
 paella.plugins.heartbeatSender = new paella.plugins.HeartbeatSender();
