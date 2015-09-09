@@ -1,7 +1,7 @@
 // A version of the deprecated es.upv.paella.UserTrackingCollectorPlugIn, 
 // shaved down to just send the heartbeat.
 
-var classDef = {
+var heartbeatSenderClassDef = {
   heartbeatTimer:null,
 
   getName: function() {
@@ -63,6 +63,10 @@ var classDef = {
   }
 };
 
-Class("paella.plugins.HeartbeatSender", paella.EventDrivenPlugin, classDef);
+Class(
+  "paella.plugins.HeartbeatSender",
+  paella.EventDrivenPlugin,
+  heartbeatSenderClassDef
+);
 
 paella.plugins.heartbeatSender = new paella.plugins.HeartbeatSender();
