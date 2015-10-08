@@ -212,7 +212,6 @@ function mockPaused() {
 }
 
 function mockPausedIsTrue() {
-  console.log('this was called.')
   return true;
 }
 
