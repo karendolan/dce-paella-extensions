@@ -36,6 +36,15 @@ Class(
           10
         );
 
+        // In the case of a live stream and a config setting that says to not 
+        // play on load, paella.player.videoContainer.paused() will always 
+        // return true, so it's not reliable then.
+        // However, our live stream player does not allow pausing. If you are 
+        // watching live stream, you are playing. So, we can count on that to 
+        // determine play state.
+        var isPlaying = !paella.player.videoContainer.paused() ||
+          paella.player.isLiveStream();
+
         var url = 'https://';
         url += location.host + '/';
         url += 'usertracking/?';
@@ -45,7 +54,7 @@ Class(
           type: 'HEARTBEAT',
           in: videoCurrentTime,
           out: videoCurrentTime,
-          playing: !paella.player.videoContainer.paused(),
+          playing: isPlaying,
           resource: paella.matterhorn.resourceId,
           _: (new Date()).getTime()
         });

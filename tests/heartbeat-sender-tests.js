@@ -2,10 +2,11 @@ var test = require('tape');
 var _ = require('lodash');
 var callNextTick = require('call-next-tick');
 var url = require('url');
+var reload = require('require-reload')(require);
 
-// !! These tests require global mocks. If they need to be run in the same  
-// process as another test in the future, teardowns need to be added.
+var modulePath = '../vendor/plugins/edu.harvard.dce.paella.heartbeatSender/heartbeat_sender';
 
+// !! These tests require global mocks.
 var mockConfig = {
   heartBeatTime: 100          
 };
@@ -33,16 +34,36 @@ test('Heartbeat tests', function heartbeatTests(t) {
   setUpMocks();
   setUpAssertingMocks(t);
 
-
   // Loading the plugin code actually executes the plugin.
   // That is how Paella plugins work.
-  require('../vendor/plugins/edu.harvard.dce.paella.heartbeatSender/heartbeat_sender');
+  require(modulePath);
 
 });
 
+test('Livestream heartbeat test', function liveStreamTest(t) {
+  tearDownGlobals();
+  
+  t.plan(15);
+
+  setUpMocks();
+  setUpAssertingMocks(t);
+
+  // For a live stream, paella.player.paused() will always return true, even if 
+  // it is playing (which it always is).
+  paella.player.isLiveStream = function mockIsLiveStream() {
+    return true;
+  };
+  paella.player.videoContainer.paused = mockPausedIsTrue;
+
+  reload(modulePath);
+});
+
+
+// TODO: Separate mocks and asserts.
+
 function setUpAssertingMocks(t) {
   global.base.Timer = timer;
-  global.XMLHttpRequest = mockXHR;
+  global.XMLHttpRequest = createMockXHR();
 
   function timer(callback, time, params) {
     t.equal(
@@ -66,19 +87,29 @@ function setUpAssertingMocks(t) {
     }
   }
 
-  function mockXHR() {
-    this.open = mockOpen;
-    this.send = mockSend;
+  function createMockXHR() {
+    function mockXHR() {
+      debugger;
+      this.open = createMockOpen();
+      this.send = createMockSend();
+    }
+    return mockXHR;
   }
 
-  function mockOpen(method, URL) {
-    t.equal(method, 'GET', 'Opens a request with the GET method.');
-    // t.equal(URL, )
-    checkHeartbeatURL(URL);
+  function createMockOpen() {
+    function mockOpen(method, URL) {
+      t.equal(method, 'GET', 'Opens a request with the GET method.');
+      // t.equal(URL, )
+      checkHeartbeatURL(URL);
+    }
+    return mockOpen;
   }
 
-  function mockSend() {
-    t.pass('The xhr is actually sent.');
+  function createMockSend() {
+    function mockSend() {
+      t.pass('The xhr is actually sent.');
+    }
+    return mockSend;
   }
 
   function checkHeartbeatURL(URL) {
@@ -137,6 +168,7 @@ function setUpAssertingMocks(t) {
 //  }
 // }
 function setUpMocks(opts) {
+
   global.location = {
     host: 'test-server'
   };
@@ -177,4 +209,16 @@ function mockTrimStart() {
 
 function mockPaused() {
   return false;
+}
+
+function mockPausedIsTrue() {
+  return true;
+}
+
+function tearDownGlobals() {
+  delete global.location;
+  delete global.paella;
+  delete global.base;
+  delete global.Class;  
+  delete global.XMLHttpRequest;
 }
