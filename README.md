@@ -5,6 +5,8 @@ This module contains [Harvard DCE](http://www.dce.harvard.edu/)-specific extensi
 
 It is not a standard Node or browser module (as of now), but rather, a way to package extensions for the build process so that we can avoid forking Paella and maintaining that fork.
 
+[![Build Status](https://travis-ci.org/harvard-dce/dce-paella-extensions.svg)](https://travis-ci.org/harvard-dce/dce-paella-extensions)
+
 Installation
 ------------
 
