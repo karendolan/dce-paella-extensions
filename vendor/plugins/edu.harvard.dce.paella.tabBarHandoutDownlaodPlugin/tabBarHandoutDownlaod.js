@@ -61,6 +61,7 @@ paella.plugins.TabBarHandoutDownlaodPlugin = Class.create(paella.TabBarPlugin, {
         link.className = 'handoutLinkItem';
         link.innerHTML = this.getTextInfo(attachment);
         link.setAttribute('tabindex', 4050 + tabindexcount);
+        link.setAttribute('target', '_blank');
         link.href = attachment.url;
         elem.appendChild(link);
         return elem;
