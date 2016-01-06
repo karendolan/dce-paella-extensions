@@ -30,7 +30,6 @@ paella.plugins.TabBarHandoutDownlaodPlugin = Class.create(paella.TabBarPlugin, {
         }
         for (var i = 0; i < attachments.length;++ i) {
             var attachment = attachments[i];
-             base.log.debug(attachment.type);
             if (attachment !== undefined) {
                 if (attachment.type == "attachment/notes") {
                    this._attachments.push(attachment);
@@ -45,7 +44,6 @@ paella.plugins.TabBarHandoutDownlaodPlugin = Class.create(paella.TabBarPlugin, {
         container.className = 'handoutsTabBarContainer';
         for (var i = 0; i < this._attachments.length;++ i) {
             var attachment = this._attachments[i];
-            base.log.debug(attachment.type);
             if (attachment !== undefined) {
                 if (attachment.type == "attachment/notes") {
                     container.appendChild(this.createLink(attachment, i));
