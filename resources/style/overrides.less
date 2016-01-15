@@ -1,0 +1,32 @@
+@menuBGColor: hsl(0, 0%, 15%);
+
+.Highlight {
+  color: white;
+  font-size: larger;
+}
+
+body {
+  font-family: "Helvetica Neue", sans-serif;
+}
+
+.captionsBar {
+  select {
+    background-color: @menuBGColor;
+  }
+
+  input {
+    border-color: inherit;
+
+    &:focus {
+      border-color: inherit;
+    }
+
+    &:hover {
+      border-color: inherit;
+    }
+  }
+}
+
+.captionsBody {
+  padding: 0.4em;
+}
