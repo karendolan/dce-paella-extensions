@@ -1,14 +1,14 @@
 /**
- * #DCE MATT-1794, UI pluging for user to access one or more Mediapackage attachments 
+ * #DCE MATT-1794, UI pluging for user to access one or more Mediapackage attachments
  * of type "attachment/notes". For example, a PDF handout.
  * #DCE-1840, Change handout download to a single button click
  */
 Class ("paella.plugins.handoutDownloadPlugin",paella.ButtonPlugin,{
+	_attachementPath: ['matterhorn', 'episode', 'mediapackage', 'attachments', 'attachment'],
 	_attachments: [],
 	_attachmentUrl:null,
 	_domElement:null,
 
-	
 	getAlignment:function() { return 'right'; },
 	getSubclass:function() { return "handoutDownloadPlugin"; },
 	getIndex:function() { return 2030; },
@@ -25,26 +25,28 @@ Class ("paella.plugins.handoutDownloadPlugin",paella.ButtonPlugin,{
 
     checkEnabled: function (onSuccess) {
         // retrieve any attached handouts (type "attachment/notes")
-        // TODO: use the Jim's is valid path
-        var attachments = paella.matterhorn.episode.mediapackage.attachments.attachment;
-        if (!(attachments instanceof Array)) {
+        // WARN: live events do not contain an attachments section
+        if (this.pathExists(paella, this._attachementPath)) {
+          var attachments = paella.matterhorn.episode.mediapackage.attachments.attachment;
+          if (!(attachments instanceof Array)) {
             attachments =[attachments];
-        }
-        for (var i = 0; i < attachments.length;++ i) {
+          }
+          for (var i = 0; i < attachments.length;++ i) {
             var attachment = attachments[i];
             if (attachment !== undefined) {
                 if (attachment.type == "attachment/notes") {
                    this._attachments.push(attachment);
                 }
             }
+          }
         }
         var isenabled = (this._attachments.length > 0 );
 		onSuccess(isenabled);
     },
 
-	action:function(button) {
+    action:function(button) {
 	    var url = null;
-        for (var i = 0; i < this._attachments.length;++ i) {
+        for (var i = 0; i < this._attachments.length; ++ i) {
             var attachment = this._attachments[i];
             if (attachment !== undefined) {
                 if (attachment.type == "attachment/notes") {
@@ -57,10 +59,21 @@ Class ("paella.plugins.handoutDownloadPlugin",paella.ButtonPlugin,{
                 }
             }
         }
- 		var self = this;
+        var self = this;
         var win = window.open(url, '_blank');
         win.focus();
-	}
+	},
+
+    // Borrowed from Jim's npm published "object-path-exists"
+    pathExists: function(object, path) {
+       var current = object;
+       return path.every(segmentExists, true);
+       function segmentExists(segment) {
+         current = current[segment];
+         return current;
+       }
+    }
+
 });
 
 new paella.plugins.handoutDownloadPlugin();
