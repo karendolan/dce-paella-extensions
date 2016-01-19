@@ -4,7 +4,7 @@
  * This plugin is modeled on Paella's mh_downloads.js
  * This plugin is dependent on paella.TabBarPlugin.
  */
-paella.plugins.TabBarHandoutDownlaodPlugin = Class.create(paella.TabBarPlugin, {
+paella.plugins.TabBarHandoutDownloadPlugin = Class.create(paella.TabBarPlugin, {
     getSubclass: function () {
         return "handouts";
     },
@@ -12,7 +12,7 @@ paella.plugins.TabBarHandoutDownlaodPlugin = Class.create(paella.TabBarPlugin, {
         return "Handouts";
     },
     getName: function () {
-        return "edu.harvard.dce.paella.tabBarHandoutDownlaodPlugin";
+        return "edu.harvard.dce.paella.tabBarHandoutDownloadPlugin";
     },
     getDefaultToolTip:function() { return base.dictionary.translate("Class Handouts"); },
     _domElement: null,
@@ -64,20 +64,21 @@ paella.plugins.TabBarHandoutDownlaodPlugin = Class.create(paella.TabBarPlugin, {
         elem.appendChild(link);
         return elem;
     },
-    
-	getTextInfo:function(attachment){
-		var text = '';
-		// parse the handout file name as the text
-		if (attachment.url) {
-			text = '<span class="handoutLinkText fileName">' + attachment.url.substr(attachment.url.lastIndexOf("/") + 1) + '</span>';
-		}
-		// in case it sends an attachment mimetype
-		var mimetype = '';
-		if (attachment.mimetype) {
-			text += ' <span class="handoutLinkText MIMEType">[' + paella.dictionary.translate(attachment.mimetype) + ']' + '</span>';
-		}
-		return text;
+
+    getTextInfo:function(attachment){
+	var text = '';
+	// parse the handout file name as the text
+	if (attachment.url) {
+		text = '<span class="handoutLinkText fileName">' + attachment.url.substr(attachment.url.lastIndexOf("/") + 1) + '</span>';
 	}
+	// in case it sends an attachment mimetype
+	var mimetype = '';
+	if (attachment.mimetype) {
+		text += ' <span class="handoutLinkText MIMEType">[' + paella.dictionary.translate(attachment.mimetype) + ']' + '</span>';
+	}
+	return text;
+    }
 });
 
-paella.plugins.tabBarHandoutDownlaodPlugin = new paella.plugins.TabBarHandoutDownlaodPlugin();
+paella.plugins.tabBarHandoutDownloadPlugin = new paella.plugins.TabBarHandoutDownloadPlugin();
+

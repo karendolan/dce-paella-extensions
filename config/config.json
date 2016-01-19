@@ -54,7 +54,7 @@
       "es.upv.paella.matterhorn.downloadsPlugin" : {
          "enabled":false
       },
-      "edu.harvard.dce.paella.tabBarHandoutDownlaodPlugin" : {
+      "edu.harvard.dce.paella.tabBarHandoutDownloadPlugin" : {
          "enabled":false
       },
       "es.upv.paella.multipleQualitiesPlugin": {
