@@ -185,26 +185,22 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
 		}
 	},
 
-	action:function(){
-		var self = this;
-		self._browserLang = base.dictionary.currentLanguage();
-		self._autoScroll = true;
+	action: function () {
+    this._browserLang = base.dictionary.currentLanguage();
+    this._autoScroll = true;
 
-		switch(self._open){
-			case 0:
-				if(self._browserLang && paella.captions.getActiveCaptions()==undefined){
-					self.selectDefaultBrowserLang(self._browserLang);
-				}
-				self._open = 1;
-				paella.keyManager.enabled = false;
-				break;
-		
-			case 1: 
-				paella.keyManager.enabled = true;
-				self._open = 0;
-				break;
-		}
+    if (this._open) {
+      this._open = false;
+      paella.keyManager.enabled = true;
+    }
+    else {
+      this._open = true;
 
+      if (this._browserLang && !paella.captions.getActiveCaptions()) {
+        this.selectDefaultBrowserLang(this._browserLang);
+      }
+      paella.keyManager.enabled = false;
+    }
 	},
 
 	buildContent:function(domElement) {
