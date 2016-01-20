@@ -250,21 +250,27 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
 
 	        
 
-        //SELECT
-        thisClass._select = document.createElement("select");
-        thisClass._select.className = "captionsSelector";
-        
-        var defOption = document.createElement("option"); // NO ONE SELECT
-        defOption.text = base.dictionary.translate("None");
-        defOption.value = "";
-        thisClass._select.add(defOption);
+      //SELECT
+      thisClass._select = document.createElement("select");
+      thisClass._select.className = "captionsSelector";
 
-        paella.captions.getAvailableLangs().forEach(function(l){
-        	var option = document.createElement("option");
-        	option.text = l.lang.txt;
-        	option.value = l.id;
-        	thisClass._select.add(option);
-        });
+      var defOption = document.createElement("option"); // NO ONE SELECT
+      defOption.text = base.dictionary.translate("Off");
+      defOption.value = "";
+      thisClass._select.add(defOption);
+
+      var langs = paella.captions.getAvailableLangs();
+      if (Array.isArray(langs) && langs.length > 0) {
+        // In our case, there should only be one language.
+        // We are going to label it 'On', so that functionally, the select
+        // control behaves as an on/off switch for captions
+        // Later, when captions and transcripts are in separate plugins, this
+        // select control will be removed entirely.
+      	var option = document.createElement("option");
+      	option.text = base.dictionary.translate("On");
+      	option.value = langs[0].id;
+      	thisClass._select.add(option);
+      }
 
          thisClass._bar.appendChild(thisClass._select);
          thisClass._parent.appendChild( thisClass._bar);
