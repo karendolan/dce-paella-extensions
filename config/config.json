@@ -176,7 +176,7 @@
       "edu.harvard.dce.paella.resizeLiveStream": {
         "enabled": true
       },
-      "es.upv.paella.captionsPlugin": {
+      "edu.harvard.dce.paella.captionsPlugin": {
         "enabled": true,
         "searchOnCaptions": false
       },
