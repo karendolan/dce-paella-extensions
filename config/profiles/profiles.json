@@ -113,15 +113,15 @@
     "masterVideo":{"content":"presenter","rect":[
       {
         "aspectRatio": "16/9",
-        "width": "1232",
-        "height": "693",
+        "width": "1154",
+        "height": "649",
         "top": "10",
         "left": "10"
       },
       {
         "aspectRatio": "16/10",
-        "width": "1120",
-        "height": "700",
+        "width": "1050",
+        "height": "656",
         "top": "10",
         "left": "117"
       },
@@ -191,15 +191,15 @@
     "slaveVideo":{"content":"presentation","rect":[
       {
         "aspectRatio": "16/9",
-        "width": "1232",
-        "height": "693",
+        "width": "1154",
+        "height": "649",
         "top": "10",
         "left": "10"
       },
       {
         "aspectRatio": "16/10",
-        "width": "1120",
-        "height": "700",
+        "width": "1050",
+        "height": "656",
         "top": "10",
         "left": "117"
       },
