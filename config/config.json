@@ -178,7 +178,7 @@
       },
       "edu.harvard.dce.paella.captionsPlugin": {
         "enabled": true,
-        "searchOnCaptions": false
+        "searchOnCaptions": true
       },
       "es.upv.paella.overlayCaptionsPlugin": {
         "enabled": true
