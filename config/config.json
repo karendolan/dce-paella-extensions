@@ -45,17 +45,14 @@
       "enabled": true
     },
     "list": {
-      "edu.harvard.dce.paella.handoutDownloadPlugin" : {
-        "enabled":true
-      },
       "edu.harvard.dce.paella.hideableExtendedTabAdapterPlugin": {
-        "enabled":false
+        "enabled": true
       },
       "es.upv.paella.matterhorn.downloadsPlugin" : {
          "enabled":false
       },
       "edu.harvard.dce.paella.tabBarHandoutDownloadPlugin" : {
-         "enabled":false
+         "enabled":true
       },
       "es.upv.paella.multipleQualitiesPlugin": {
         "enabled": true
@@ -178,7 +175,7 @@
       },
       "edu.harvard.dce.paella.captionsPlugin": {
         "enabled": true,
-        "searchOnCaptions": false
+        "searchOnCaptions": true
       },
       "es.upv.paella.overlayCaptionsPlugin": {
         "enabled": true
