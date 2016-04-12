@@ -8,7 +8,7 @@ var modulePath = '../vendor/plugins/edu.harvard.dce.paella.heartbeatSender/heart
 
 // !! These tests require global mocks.
 var mockConfig = {
-  heartBeatTime: 100          
+  heartBeatTime: 100
 };
 
 var mockPaellaObject = {
@@ -28,7 +28,7 @@ var mockPaellaObject = {
 };
 
 test('Heartbeat tests', function heartbeatTests(t) {
-  t.plan(15);
+  t.plan(14);
 
   // Set up mocks and checks.
   setUpMocks();
@@ -42,13 +42,13 @@ test('Heartbeat tests', function heartbeatTests(t) {
 
 test('Livestream heartbeat test', function liveStreamTest(t) {
   tearDownGlobals();
-  
-  t.plan(15);
+
+  t.plan(14);
 
   setUpMocks();
   setUpAssertingMocks(t);
 
-  // For a live stream, paella.player.paused() will always return true, even if 
+  // For a live stream, paella.player.paused() will always return true, even if
   // it is playing (which it always is).
   paella.player.isLiveStream = function mockIsLiveStream() {
     return true;
@@ -116,7 +116,6 @@ function setUpAssertingMocks(t) {
     var urlParts = url.parse(URL, true);
     var query = urlParts.query;
 
-    t.equal(urlParts.protocol, 'https:', 'Request is sent via https.');
     t.equal(urlParts.pathname, '/usertracking/', 'Request pathname is correct.');
 
     t.equal(
@@ -185,7 +184,7 @@ function setUpMocks(opts) {
 
     function createClass() {
       var classInst = _.cloneDeep(classDef);
-      classInst.config = _.cloneDeep(mockConfig);      
+      classInst.config = _.cloneDeep(mockConfig);
       classInst.setup();
 
       if (opts && opts.classMethods) {
@@ -219,6 +218,6 @@ function tearDownGlobals() {
   delete global.location;
   delete global.paella;
   delete global.base;
-  delete global.Class;  
+  delete global.Class;
   delete global.XMLHttpRequest;
 }
