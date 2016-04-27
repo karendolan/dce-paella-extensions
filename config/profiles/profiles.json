@@ -213,5 +213,148 @@
     ],"visible":"true","layer":"1"
     },
     "background":{"content":"slide_professor_paella.jpg","zIndex":5,"rect":{"left":"0","top":"0","width":"1280","height":"720"},"visible":"true","layer":"0"}
-  }
+  },
+    "presenter_only":{
+    "name":{"en":"Presenter Only"},
+    "masterVideo":{"content":"presenter","rect":[
+      {
+        "aspectRatio": "16/9",
+        "width": "1280",
+        "height": "720",
+        "top": "0",
+        "left": "0"
+      },
+      {
+        "aspectRatio": "16/10",
+        "width": "1050",
+        "height": "656",
+        "top": "10",
+        "left": "117"
+      },
+      {
+        "aspectRatio": "4/3",
+        "width": "960",
+        "height": "720",
+        "top": "0",
+        "left": "160"
+      }
+    ],"visible":"true","layer":"1"
+    },
+    "slaveVideo":{"content":"presentation","rect":[
+      {
+        "aspectRatio": "16/9",
+        "width": "0",
+        "height": "0",
+        "top": "0",
+        "left": "0"
+      },
+      {
+        "aspectRatio": "16/10",
+        "width": "0",
+        "height": "0",
+        "top": "0",
+        "left": "0"
+      },
+      {
+        "aspectRatio": "4/3",
+        "width": "0",
+        "height": "0",
+        "top": "0",
+        "left": "0"
+      }
+    ],"visible":"false","layer":"1"
+    },
+    "background":{"content":"slide_professor_paella.jpg","zIndex":5,"rect":{"left":"0","top":"0","width":"1280","height":"720"},"visible":"true","layer":"0"}
+  },
+
+  "presentation_only":{
+    "name":{"en":"Presentation Only"},
+    "icon":"professor_slide_icon.png",
+    "masterVideo":{"content":"presenter","rect":[
+      {
+        "aspectRatio": "16/9",
+        "width": "0",
+        "height": "0",
+        "top": "0",
+        "left": "0"
+      },
+      {
+        "aspectRatio": "16/10",
+        "width": "0",
+        "height": "0",
+        "top": "0",
+        "left": "0"
+      },
+      {
+        "aspectRatio": "4/3",
+        "width": "0",
+        "height": "0",
+        "top": "0",
+        "left": "0"
+      }
+    ],"visible":"false","layer":"2"
+    },
+    "slaveVideo":{"content":"presentation","rect":[
+      {
+        "aspectRatio": "16/9",
+        "width": "1280",
+        "height": "720",
+        "top": "0",
+        "left": "0"
+      },
+      {
+        "aspectRatio": "16/10",
+        "width": "1050",
+        "height": "656",
+        "top": "10",
+        "left": "117"
+      },
+      {
+        "aspectRatio": "4/3",
+        "width": "960",
+        "height": "720",
+        "top": "0",
+        "left": "160"
+      }
+    ],"visible":"true","layer":"1"
+    },
+    "background":{"content":"slide_professor_paella.jpg","zIndex":5,"rect":{"left":"0","top":"0","width":"1280","height":"720"},"visible":"true","layer":"0"}
+  },
+    "monostream":{
+    "name":{"en":"Single Video"},
+    "icon":"professor_slide_icon.png",
+    "masterVideo":{"content":"presenter","rect":[
+      {"aspectRatio":"16/9","left":"0","top":"0","width":"1280","height":"720"},
+      {"aspectRatio":"16/10","left":"64","top":"0","width":"1152","height":"720"},
+      {"aspectRatio":"5/3","left":"40","top":"0","width":"1200","height":"720"},
+      {"aspectRatio":"5/4","left":"190","top":"0","width":"900","height":"720"},
+      {"aspectRatio":"4/3","left":"160","top":"0","width":"960","height":"720"}
+      ],"visible":"true","layer":"1"
+		},
+		    "slaveVideo":{"content":"slides","rect":[
+      {
+        "aspectRatio": "16/9",
+        "width": "0",
+        "height": "0",
+        "top": "0",
+        "left": "0"
+      },
+      {
+        "aspectRatio": "16/10",
+        "width": "0",
+        "height": "0",
+        "top": "0",
+        "left": "0"
+      },
+      {
+        "aspectRatio": "4/3",
+        "width": "0",
+        "height": "0",
+        "top": "0",
+        "left": "0"
+      }
+    ],"visible":"false","layer":"1"
+    },
+    "background":{"content":"slide_professor_paella.jpg","zIndex":5,"rect":{"left":"0","top":"0","width":"1280","height":"720"},"visible":"true","layer":"0"}
+    }
 }
