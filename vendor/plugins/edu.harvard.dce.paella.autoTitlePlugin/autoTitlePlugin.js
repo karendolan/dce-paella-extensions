@@ -1,4 +1,5 @@
 Class ("paella.plugins.AutoTitlePlugin", paella.EventDrivenPlugin, {
+  _isFirstTime: true,
   getName: function() {
     return "edu.harvard.dce.paella.autoTitlePlugin";
   },
@@ -19,7 +20,7 @@ Class ("paella.plugins.AutoTitlePlugin", paella.EventDrivenPlugin, {
             dcObj.title[0].value
             ).append(
               jQuery('<span class="seriesTitle" />').text(' :: ' + dcObj.subject[0].value)
-              )
+            )
           );
     } catch(err) {
       console.log(err.message);
@@ -28,7 +29,10 @@ Class ("paella.plugins.AutoTitlePlugin", paella.EventDrivenPlugin, {
   },
 
   onEvent: function(event, params) {
-    jQuery('#dceHeader .primary').after(this._createSeriesTitleNode());
+    if (this._isFirstTime) {
+      jQuery('#dceHeaderBannerless').append(this._createSeriesTitleNode());
+      this._isFirstTime = false;
+    }
   }
 });
 

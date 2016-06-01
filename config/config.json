@@ -172,10 +172,10 @@
         "enabled": true
       },
       "edu.harvard.dce.paella.autoBannerPlugin": {
-        "enabled": true
+        "enabled": false
       },
       "edu.harvard.dce.paella.autoTitlePlugin": {
-        "enabled": true
+        "enabled": false
       },
       "edu.harvard.dce.paella.add2xPlaybackChoice": {
         "enabled": true
