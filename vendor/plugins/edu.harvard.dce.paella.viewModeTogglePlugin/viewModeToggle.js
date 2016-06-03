@@ -56,6 +56,8 @@ Class ("paella.plugins.ViewModeTogglePlugin",paella.ButtonPlugin,{
     } else {
       chosenProfile = profileOrder[lastProfileIndex + 1];
     }
+
+    base.log.debug("Now triggering event setProfile on " + chosenProfile);
     overlayContainer = paella.player.videoContainer.overlayContainer;
     overlayContainer.clear();
     paella.events.trigger(
@@ -66,7 +68,21 @@ Class ("paella.plugins.ViewModeTogglePlugin",paella.ButtonPlugin,{
   },
   checkEnabled:function(onSuccess) {
     onSuccess(paella.player.videoContainer.slaveVideo() !== undefined);
+  },
+
+  // called by Mutli-Single view (presentationOnlyPlugin)
+  turnOffVisibility: function(){
+    paella.PaellaPlayer.mode.none = 'none';
+    this.config.visibleOn = [paella.PaellaPlayer.mode.none];
+    this.hideUI();
+  },
+
+  // called by Mutli-Single view (presentationOnlyPlugin)
+  turnOnVisibility: function(){
+    this.config.visibleOn = undefined;
+    this.checkVisibility();
   }
+
 });
 
 paella.plugins.viewModeTogglePlugin = new paella.plugins.ViewModeTogglePlugin();

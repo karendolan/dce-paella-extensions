@@ -60,7 +60,7 @@
          "enabled":true
       },
       "es.upv.paella.multipleQualitiesPlugin": {
-        "enabled": true
+        "enabled": false
       },
       "es.upv.paella.ImageControlPlugin": {
         "enabled": false
@@ -108,6 +108,14 @@
         "enabled": true,
         "direction": "Forward",
         "seconds": 30
+      },
+      "edu.harvard.edu.paella.presentationQualitiesPlugin" : {
+         "enabled": true,
+         "showWidthRes":true,
+         "presenterHasAudioTag":"multiaudio"
+      },
+      "edu.harvard.dce.paella.presentationOnlyPlugin": {
+         "enabled": true
       },
       "es.upv.paella.footprintsPlugin": {
         "enabled": false
@@ -164,10 +172,10 @@
         "enabled": true
       },
       "edu.harvard.dce.paella.autoBannerPlugin": {
-        "enabled": true
+        "enabled": false
       },
       "edu.harvard.dce.paella.autoTitlePlugin": {
-        "enabled": true
+        "enabled": false
       },
       "edu.harvard.dce.paella.add2xPlaybackChoice": {
         "enabled": true
