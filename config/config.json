@@ -171,6 +171,9 @@
       "edu.harvard.dce.paella.autoHeaderHidePlugin": {
         "enabled": true
       },
+      "edu.harvard.dce.paella.topAlignVideoPlugin": {
+         "enabled": true
+      },
       "edu.harvard.dce.paella.autoBannerPlugin": {
         "enabled": false
       },
