@@ -29,10 +29,19 @@
     "rtmpSettings": {
       "bufferTime": 5,
       "requiresSubscription": false
+    },
+    "slidesMarks": {
+      "enabled": true,
+      "color": "gray"
     }
   },
   "editor": {
     "enabled": false
+  },
+  "folders": {
+    "profiles": "config/profiles",
+    "resources": "resources",
+    "skins": "resources/style"
   },
   "defaultProfile": "professor_slide",
   "data": {
@@ -41,8 +50,18 @@
       "default": "CookieDataDelegate",
       "trimming": "CookieDataDelegate",
       "userInfo": "UserDataDelegate",
-      "images": "ImageZoomDataDelegate"
+      "images": "ImageZoomDataDelegate",
+      "captions": "MHCaptionsDataDelegate",
+      "annotations": "MHAnnotationServiceDefaultDataDelegate",
+      "visualAnnotations": "MHAnnotationServiceDefaultDataDelegate",
+      "comments": "MHAnnotationServiceDefaultDataDelegate",
+      "footprints": "MHFootPrintsDataDelegate",
+      "timedComments": "TimedCommentsDataDelegate"
     }
+  },
+  "skin": {
+    "default": "cs50",
+    "available": [ "cs50", "dark", "dark_small", "light", "light_small" ]
   },
   "plugins": {
     "enablePluginsByDefault": false,
@@ -51,13 +70,13 @@
     },
     "list": {
       "edu.harvard.dce.paella.hideableExtendedTabAdapterPlugin": {
-        "enabled": true
+        "enabled": false
       },
       "es.upv.paella.matterhorn.downloadsPlugin" : {
          "enabled":false
       },
       "edu.harvard.dce.paella.tabBarHandoutDownloadPlugin" : {
-         "enabled":true
+         "enabled":false
       },
       "es.upv.paella.multipleQualitiesPlugin": {
         "enabled": false
@@ -66,22 +85,38 @@
         "enabled": false
       },
       "es.upv.paella.ShowEditorPlugin": {
-        "enabled": false,
-        "alwaysVisible": false
+        "enabled": true,
+        "alwaysVisible": true
       },
       "es.upv.paella.TrimmingPlayerPlugin": {
         "enabled": false
       },
       "es.upv.paella.editor.TrimmingTrackPlugin": {
-        "enabled": false
+        "enabled": true
       },
       "es.upv.paella.playPauseButtonPlugin": {
         "enabled": true
       },
       "es.upv.paella.test.videoLoadPlugin": {
-        "enabled": false
+        "enabled": true
       },
       "es.upv.paella.test.playbackRate": {
+        "enabled": true
+      },
+      "es.upv.paella.annotationsPlayerPlugin": {
+        "enabled": false
+      },
+      "es.upv.paella.editor.trackAnnotations": {
+        "enabled": true
+      },
+      "es.upv.paella.visualAnnotationPlugin": {
+        "enabled": false,
+        "url-useDefault": ""
+      },
+      "es.upv.paella.commentsPlayerPlugin": {
+        "enabled":false
+      },
+      "es.upv.paella.commentsPlugin": {
         "enabled": false
       },
       "es.upv.paella.volumeRangePlugin": {
@@ -97,7 +132,8 @@
         "enabled": true
       },
       "es.upv.paella.repeatButtonPlugin": {
-        "enabled": false
+        "enabled": false,
+        "replacedBy": "flexSkipPlugin"
       },
       "edu.harvard.dce.paella.flexSkipPlugin": {
         "enabled": true,
@@ -119,6 +155,12 @@
       },
       "es.upv.paella.footprintsPlugin": {
         "enabled": false
+      },
+      "es.upv.paella.timedCommentsHeatmapPlugin": {
+        "enabled": true
+      },
+      "es.upv.paella.timedCommentsOverlayPlugin": {
+        "enabled": true
       },
       "es.upv.paella.playbackRatePlugin": {
         "enabled": true
@@ -144,7 +186,7 @@
         }
       },
       "es.upv.paella.extendedProfilesPlugin": {
-        "enabled": false,
+        "enabled": true,
         "reloadOnFullscreen": "reload"
       },
       "es.upv.paella.themeChooserPlugin": {
@@ -200,8 +242,5 @@
   },
   "standalone": {
     "reposiroty": "../repository/"
-  },
-  "skin": {
-    "default": "cs50"
   }
 }

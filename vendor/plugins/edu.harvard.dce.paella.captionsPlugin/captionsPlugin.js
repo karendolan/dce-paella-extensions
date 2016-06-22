@@ -21,7 +21,7 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
 	getSubclass:function() { return 'captionsPluginButton'; },
 	getName:function() { return "edu.harvard.dce.paella.captionsPlugin"; },
 	getButtonType:function() { return paella.ButtonPlugin.type.popUpButton; },	
-	getDefaultToolTip:function() { return base.dictionary.translate("Subtitles"); },
+	getDefaultToolTip:function() { return base.dictionary.translate("Captions"); },
 	getIndex:function() {return 509;},
 
 	checkEnabled:function(onSuccess) {

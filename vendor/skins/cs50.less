@@ -15,7 +15,7 @@
 
 @shadowColor: #e4e4e4;
 
-@paella_icons_image: url(../images/paella_icons_light.png);
+@paella_icons_image: url(../images/paella_icons_light_dce.png);
 
 @paella_icons_bkg_size: 2000% 1000%;
 
@@ -104,4 +104,33 @@ div#playerContainer_controls_playback_playbackBar_full{
   .frameControlItem:hover{
     opacity: 0.5;
   }
+}
+
+/* MATT-2094 Overrides the Paella UPV footprints.less (which puts the image at -260px) */
+.buttonPlugin.footPrints {
+	background-position: -210px 0px;
+}
+
+/* MATT-2094 Overrides Paella UPV comments plugin css */
+.comments_entry_container {
+    margin: 10px 10px 10px 20px;
+    border-radius: 6px;
+}
+
+.comments_entry_comment {
+    background-color: #888;
+    padding-bottom: 10px;
+    padding-top: 5px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-left: 5px;
+    border-radius: 6px;
+}
+.comments_entry {
+    margin: 1px 1px 10px;
+    width: 90%;
+}
+
+.reply_button .comments_entry_datepublish {
+  color: #666;
 }
