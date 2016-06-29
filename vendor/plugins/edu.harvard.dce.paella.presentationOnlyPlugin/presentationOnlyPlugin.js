@@ -60,7 +60,9 @@ Class ("paella.plugins.PresentationOnlyPlugin", paella.EventDrivenPlugin, {
   toggleResolution: function (label, reso, reso2, type) {
     var thisClass = this;
     var sources = null;
-    if (thisClass._slave === null) {
+    if (thisClass._currentQuality == '') {
+      thisClass._currentQuality = (paella.plugins.multipleQualitiesPlugin? paella.plugins.multipleQualitiesPlugin.getCurrentResLabel(): thisClass._currentQuality);
+      thisClass.isCurrentlySingleStream =  paella.player.videoContainer.isMonostream;
       base.log.debug("PO: Getting  original stream sources");
       thisClass._getStreamSources();
     }
@@ -94,11 +96,11 @@ Class ("paella.plugins.PresentationOnlyPlugin", paella.EventDrivenPlugin, {
       if (this._presentationOnlyProfile === this._currentProfile) {
         base.log.debug("PO: saved profile is " + this._currentProfile + ", but changing to " + paella.player.config.defaultProfile);
         base.log.debug("PO: TODO... quality needs to reload monostream saved profile " + this._currentProfile);
-        this.isCurrentlySingleStream = false;
+        this.isCurrentlySingleStream = paella.player.videoContainer.isMonostream;
         this._currentProfile = paella.player.config.defaultProfile;
         this._triggerProfileUpdate();
       } else {
-        this.isCurrentlySingleStream = false;
+        this.isCurrentlySingleStream = paella.player.videoContainer.isMonostream;
       }
     }
   },
