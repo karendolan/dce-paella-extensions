@@ -128,6 +128,12 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
     var w, h, d, e, b = 0;
     var percen1, percen2, reso2, act_percen;
     percen1 = 100 / this.availableMasters.length;
+
+    if (this.availableSlaves.length == 0 && this.availableMasters.length > 0) {
+      this._buildSingleStreamDom(this.availableMasters);
+      return;
+    }
+
     percen2 = 100 / this.availableSlaves.length;
 
     if (this.availableSlaves.length > 0 && ! this._isFiltered()) {
