@@ -7,6 +7,7 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
   commentHeatmapTimer: null,
   footPrintData: {},
   ifModifiedSinceDate: "1999-12-31T23:59:59Z", //yyyy-MM-dd'T'HH:mm:ss'Z',
+  ifModifiedSinceClientOffset: null,
   isEnabled: false,
 
   getAlignment: function () {
@@ -31,6 +32,13 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
 
   setup: function () {
     var thisClass = this;
+
+    // Get the client side offset to the server side date
+    if (paella.matterhorn.me && paella.matterhorn.me.timestamp) {
+      thisClass.ifModifiedSinceClientOffset = (new Date()) - paella.matterhorn.me.timestamp;
+    } else {
+      thisClass.ifModifiedSinceServerDate = 0;
+    }
 
     switch (this.config.skin) {
       case 'custom':
@@ -129,7 +137,12 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
   //Footprint reload sends annotations updated event (caught by any plugin interested in updated comments)
   loadcommentHeatmap: function (refreshOnly) {
     var thisClass = this;
-    var lastRequestDateStr = thisClass.makeISODateString(new Date());
+    var lastRequestDateStr;
+    // use server time
+    var currentServerTime = new Date() - thisClass.ifModifiedSinceClientOffset;
+    lastRequestDateStr = thisClass.makeISODateString(new Date(currentServerTime));
+
+
     paella.data.read('timedComments', {
       id: paella.initDelegate.getId(),
       ifModifiedSince: thisClass.ifModifiedSinceDate
