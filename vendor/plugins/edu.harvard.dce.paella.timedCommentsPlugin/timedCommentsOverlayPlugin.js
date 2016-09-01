@@ -613,7 +613,6 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     thisClass._curScrollTop = $("#innerAnnotation").scrollTop();
     var txtValue = paella.AntiXSS.htmlEscape(thisClass.publishCommentTextArea.val());
     var isPrivateCheck = thisClass.publishCommentIsPrivateCheck.val() === true ? true: false;
-    var now = new Date();
 
     // create the new comment
     var newComment = {};
@@ -621,7 +620,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     newComment.userName = paella.initDelegate.initParams.accessControl.userData.name;
     newComment.mode = "comment";
     newComment.value = txtValue;
-    newComment.created = now;
+    // NOTE newComment.created is set by server to server time
     var data = {
       timedComment: newComment
     };
@@ -636,7 +635,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     });
   },
 
-  //#DCE Rute 7/21: adding a reply now creates a new annotation entry. The inpoint is the same as the
+  //#DCE Rute 7/21: adding a reply creates a new annotation entry. The inpoint is the same as the
   // parent annotation to help sorting.
   addReply: function (textArea) {
     var thisClass = this;
@@ -648,7 +647,6 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     var parentAnnotId = commentBlock.attr( "data-parent-id");
     var isPrivate = commentBlock.attr( "data-private");
     var inPoint = commentBlock.attr( "data-inpoint");
-    var now = new Date();
 
     // create the new reply
     var newComment = {};
@@ -656,7 +654,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     newComment.mode = "reply";
     newComment.value = txtValue;
     newComment.parent = parentAnnotId.toString();
-    newComment.created = now;
+    // NOTE newComment.created is set by server to server time
     var data = {
       timedComment: newComment
     };
@@ -694,7 +692,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
       var monthIndex = date.getMonth();
       var hour = ('00'+ date.getHours()).slice(-2);
       var minute = ('00'+ date.getMinutes()).slice(-2);
-      result = this._shortMonths[monthIndex] + " " + day + ", " + hour + ":" + minute ;
+      result = this._shortMonths[monthIndex] + " " + day + ", " + hour + ":" + minute + "US ET";
     }
     return result;
   },

@@ -1,6 +1,6 @@
 {
   "name": "dce-paella-extensions",
-  "version": "1.3.112",
+  "version": "1.3.113",
   "description": "Harvard DCE Extensions for the Paella video player",
   "main": "index.js",
   "scripts": {
