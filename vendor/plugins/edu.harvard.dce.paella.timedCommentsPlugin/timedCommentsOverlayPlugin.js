@@ -131,7 +131,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     thisClass._isActive = true;
   },
 
-  // This is having problems in multiple browsers and dates of concurrent comments are not correct
+  // Sort annotations for display in annotation UI
   sortAnnotations: function () {
     var thisClass = this;
     var commentList =[];
@@ -140,8 +140,8 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     };
 
     if (thisClass._annotations) {
-      //#DCE Rute: Now each comment and reply is a separate annotation
-      // First sort by inpoint, then by 'comment' id, then by annotation date
+      // DCE modification is that Each comment and reply are in a separate annotation
+      // to sort, create a map of comment replies and a separate collection of comment parents
       thisClass._annotations.forEach(function (annot) {
         var timedComment = annot.value.timedComment;
         if (timedComment.mode == 'comment') {
@@ -156,6 +156,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
         }
       });
 
+      // Sort comments by inpoint, then by annotation date
       commentList = commentList.sort(function (a, b) {
         // First, sort by inpoint (a comment and its replies will have the same inpoint)
         // multiple comments can share the same inpoint
@@ -169,6 +170,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
         return ((adate > bdate) ? 1: ((adate < bdate)? -1 : 0));
       });
 
+      // Sort individual reply groups by annot date
       commentList.forEach(function (comment) {
         // sort individual reply groups
         var mapList = replyMap[comment.annotationId];
@@ -187,6 +189,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     }
   },
 
+  // add the sorted replies in with the parent comments
   mergeCommentsReplies: function (comments, replies) {
     var combined =[];
     var ci = 0;
@@ -321,10 +324,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     $('#TimedCommentPlugin_Comments').click(function (event) {
       event.stopImmediatePropagation();
     });
-    // popup menu over timed comment to move it to a new window
-    // thisClass.appendCommentMoveMenu($('#TimedCommentPlugin_Comments'));
 
-    //WARNING:  .on(...mouseleave..) works, but .mouseleave() and .hover() do not while the video is playing.
     // Allow user to scroll when moues over timed contents area, i.e. stop autoscoll
     $('#TimedCommentPlugin_Comments').on({
       mouseenter: function (event) {

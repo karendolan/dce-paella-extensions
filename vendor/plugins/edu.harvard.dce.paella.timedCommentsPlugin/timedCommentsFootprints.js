@@ -6,7 +6,6 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
   canvas: null,
   commentHeatmapTimer: null,
   footPrintData: {},
-  commentTotal: 0,
   ifModifiedSinceDate: "1999-12-31T23:59:59Z", //yyyy-MM-dd'T'HH:mm:ss'Z',
   isEnabled: false,
 
@@ -103,12 +102,9 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
     thisClass.commentHeatmapTimer.repeat = true;
   },
 
-  // on refreshes data if result TOTAL has changed since last update
-  // result count is interim until a "last updated by mpId" endpoint is on the annot service
   refreshPrints: function (annotData) {
     var thisClass = this;
-    if (annotData && (annotData.length != thisClass.commentTotal)) {
-      thisClass.commentTotal = annotData.length;
+    if (annotData) {
       thisClass.loadfootPrintData(annotData, status);
       if (paella.events.refreshTimedComments) {
         paella.events.trigger(paella.events.refreshTimedComments, {
@@ -145,7 +141,6 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
         base.log.debug("TC Refreshing prints, found " + (data ? data.length: 0));
         thisClass.refreshPrints(data);
       } else {
-        thisClass.commentTotal = data ? data.length: 0;
         thisClass.loadfootPrintData(data, status);
       }
       thisClass.ifModifiedSinceDate = lastRequestDateStr;
