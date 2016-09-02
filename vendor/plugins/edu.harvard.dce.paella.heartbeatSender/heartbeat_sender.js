@@ -17,24 +17,22 @@ Class(
       var thisClass = this;
 
       if (this.config.heartBeatTime > 0) {
-        this.heartbeatTimer = new base.Timer(
-          registerHeartbeat, this.config.heartBeatTime
-        );
-        this.heartbeatTimer.repeat = true;
+          thisClass.heartbeatTimer = new base.Timer(
+            registerHeartbeat, thisClass.config.heartBeatTime
+          );
+          thisClass.heartbeatTimer.repeat = true;
       }
 
       function registerHeartbeat(timer) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', getHeartbeatURL());
-        xhr.send();
+        paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', getHeartbeatURL(videoData));
+          xhr.send();
+        });
       }
 
-      function getHeartbeatURL() {
-        var videoCurrentTime = parseInt(
-          paella.player.videoContainer.currentTime() +
-          paella.player.videoContainer.trimStart(),
-          10
-        );
+      function getHeartbeatURL(videoData) {
+        var videoCurrentTime = parseInt(videoData.currentTime + paella.player.videoContainer.trimStart(), 10);
 
         // In the case of a live stream and a config setting that says to not
         // play on load, paella.player.videoContainer.paused() will always
@@ -42,7 +40,7 @@ Class(
         // However, our live stream player does not allow pausing. If you are
         // watching live stream, you are playing. So, we can count on that to
         // determine play state.
-        var isPlaying = !paella.player.videoContainer.paused() ||
+        var isPlaying = !videoData.paused ||
           paella.player.isLiveStream();
 
         var url = '/usertracking/?';
@@ -50,10 +48,10 @@ Class(
           _method: 'PUT',
           id: paella.player.videoIdentifier,
           type: 'HEARTBEAT',
-          in: videoCurrentTime,
-          out: videoCurrentTime,
+          'in': videoCurrentTime,
+          'out': videoCurrentTime,
           playing: isPlaying,
-          resource: paella.matterhorn.resourceId,
+          resource: paella.opencast.resourceId,
           _: (new Date()).getTime()
         });
 

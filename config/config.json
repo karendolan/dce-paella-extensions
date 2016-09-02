@@ -5,22 +5,12 @@
     "profileFrameStrategy": "paella.ProfileFrameStrategy",
     "videoQualityStrategy": "paella.BestFitVideoQualityStrategy",
     "methods": [
-      {
-        "name": "streaming",
-        "enabled": true
-      },
-      {
-        "name": "html",
-        "enabled": true
-      },
-      {
-        "name": "image",
-        "enabled": true
-      },
-      {
-        "name": "flash",
-        "enabled": true
-      }
+        { "factory":"MpegDashVideoFactory", "enabled":true },
+        { "factory":"Html5VideoFactory", "enabled":true },
+        { "factory":"RTMPVideoFactory", "enabled":true },
+        { "factory":"HLSVideoFactory", "enabled":true },
+        { "factory":"ImageVideoFactory", "enabled":true },
+        { "factory":"YoutubeVideoFactory", "enabled":true }
     ],
     "audio": {
         "master": 1.0,
@@ -34,9 +24,6 @@
       "enabled": true,
       "color": "gray"
     }
-  },
-  "editor": {
-    "enabled": false
   },
   "folders": {
     "profiles": "config/profiles",
@@ -71,7 +58,7 @@
       "edu.harvard.dce.paella.hideableExtendedTabAdapterPlugin": {
         "enabled": false
       },
-      "es.upv.paella.matterhorn.downloadsPlugin" : {
+      "es.upv.paella.opencast.downloadsPlugin" : {
          "enabled":false
       },
       "edu.harvard.dce.paella.tabBarHandoutDownloadPlugin" : {
@@ -118,6 +105,10 @@
       "es.upv.paella.commentsPlugin": {
         "enabled": false
       },
+      "es.upv.paella.captionsPlugin": {
+         "enabled": false,
+         "//": "Using DCE modified captions plugin, see below"
+      },
       "es.upv.paella.volumeRangePlugin": {
         "enabled": true,
         "showMasterVolume": true,
@@ -127,8 +118,9 @@
         "enabled": true,
         "heartBeatTime": 30000
       },
-      "es.upv.paella.matterhorn.userTrackingSaverPlugIn": {
-        "enabled": true
+      "es.upv.paella.opencast.userTrackingSaverPlugIn": {
+        "enabled": true,
+         "//": "Using temp overwrite until https://github.com/polimediaupv/paella-matterhorn/issues/22"
       },
       "es.upv.paella.repeatButtonPlugin": {
         "enabled": false,
@@ -144,7 +136,7 @@
         "direction": "Forward",
         "seconds": 30
       },
-      "edu.harvard.edu.paella.presentationQualitiesPlugin" : {
+      "edu.harvard.edu.paella.singleMultipleQualitiesPlugin" : {
          "enabled": true,
          "showWidthRes":true,
          "presenterHasAudioTag":"multiaudio"
@@ -155,10 +147,10 @@
       "es.upv.paella.footprintsPlugin": {
         "enabled": false
       },
-      "es.upv.paella.timedCommentsHeatmapPlugin": {
+      "edu.harvard.dce.paella.timedCommentsHeatmapPlugin": {
         "enabled": true
       },
-      "es.upv.paella.timedCommentsOverlayPlugin": {
+      "edu.harvard.dce.paella.timedCommentsOverlayPlugin": {
         "enabled": true
       },
       "es.upv.paella.playbackRatePlugin": {
@@ -180,7 +172,8 @@
       "es.upv.paella.fullScreenButtonPlugin": {
         "enabled": true,
         "reloadOnFullscreen": {
-          "enabled": true,
+          "//": "#DCE reloading video on full screen is problematic with rtmp live streams",
+          "enabled": false,
           "keepUserSelection": true
         }
       },
@@ -221,7 +214,7 @@
       "edu.harvard.dce.paella.add2xPlaybackChoice": {
         "enabled": true
       },
-      "es.upv.paella.liveStramingIndicatorPlugin": {
+      "es.upv.paella.liveStreamingIndicatorPlugin": {
         "enabled": true
       },
       "edu.harvard.dce.paella.resizeLiveStream": {

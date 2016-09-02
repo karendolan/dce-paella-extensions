@@ -14,16 +14,18 @@ Class ("paella.plugins.ShowTotalTimePlugin",paella.EventDrivenPlugin,{
   onEvent: function(event, params){
     if(! paella.player.isLiveStream()){
       if (! this._updatedDuration){
-        var duration = paella.player.videoContainer.duration();
-        if (duration > 0){
-          var formattedDuration = $("<div id='totalDuration' class='timeControl' />").text(
-              this._formattedMilliseconds(duration)
-              );
-          $('div#playerContainer_controls_playback_playbackBar_timeControl').after(
-              formattedDuration
-              );
-          this._updatedDuration = true;
-        }
+        paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
+          var duration = videoData.duration;
+          if (duration > 0){
+            var formattedDuration = $("<div id='totalDuration' class='timeControl' />").text(
+                this._formattedMilliseconds(duration)
+                );
+            $('div#playerContainer_controls_playback_playbackBar_timeControl').after(
+                formattedDuration
+                );
+            this._updatedDuration = true;
+          }
+        });
       }
     }
   }

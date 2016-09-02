@@ -17,78 +17,71 @@ Class ("paella.plugins.PresentationOnlyPlugin", paella.EventDrivenPlugin, {
   _currentProfile: '',
   _isSeekToTime: false,
   _seekToThisTime: 0,
-
+  
   getName: function () {
     return "edu.harvard.dce.paella.presentationOnlyPlugin";
   },
-
+  
   getEvents: function () {
-    return[paella.events.setProfile, paella.events.singleVideoReady];
+    return[paella.events.setProfile, paella.events.loadPlugins];
   },
-
-  checkEnabled: function (onSuccess) {
-    onSuccess(! paella.player.isLiveStream() && ! paella.player.videoContainer.isMonostream);
-  },
-
+  
   onEvent: function (eventType, params) {
-    var thisClass = this;
     switch (eventType) {
-
       case paella.events.setProfile:
         this._currentProfile = params.profileName;
         break;
-
-      // Mitigate seek to time race condition by seeking on video loaded event
-      case paella.events.singleVideoReady:
-        if (this._currentProfile === '') {
-          this._firstLoadAction();
-        } else {
-          this._toggleSeekToTime();
-        }
+      case paella.events.loadPlugins:
+        this._firstLoadAction();
         break;
     }
   },
-
-/**
- * Called directly by qualitiesPresentationPlugin
- * 1. if on single and mutli coming across, change to multi of passed res
- * 2. if on multi and single coming accross, change to single and passed res
- * 3. if on same type and different res change, change res
- * 4. if on same type and same res, don't do anything
- *
- */
-  toggleResolution: function (label, reso, reso2, type) {
-    var thisClass = this;
-    var sources = null;
-    if (thisClass._currentQuality == '') {
-      thisClass._currentQuality = (paella.plugins.multipleQualitiesPlugin? paella.plugins.multipleQualitiesPlugin.getCurrentResLabel(): thisClass._currentQuality);
-      thisClass.isCurrentlySingleStream =  paella.player.videoContainer.isMonostream;
-      base.log.debug("PO: Getting  original stream sources");
-      thisClass._getStreamSources();
-    }
-    if (!thisClass.isCurrentlySingleStream && type === paella.plugins.multipleQualitiesPlugin.singleStreamLabel) {
-      thisClass._toggleMultiToSingleProfile(reso, reso2);
-    } else if (thisClass.isCurrentlySingleStream && type === paella.plugins.multipleQualitiesPlugin.multiStreamLabel) {
-      thisClass._toggleSingleToMultiProfile(reso, reso2);
-    } else if (label === thisClass._currentQuality) {
-      base.log.debug("PO: no work needed, same quality " + label + ", reso:" + reso + ", reso2: " + reso2);
-    } else if (label !== thisClass._currentQuality && ! thisClass.isCurrentlySingleStream) {
-      base.log.debug("PO: Multi view, changing resolution from " + thisClass._currentQuality + " to " + label + ". Calling default reload.");
-      paella.player.reloadVideos(reso, reso2);
-    } else if (label !== thisClass._currentQuality && thisClass.isCurrentlySingleStream) {
-      base.log.debug("PO: Single view, changing resolution from " + thisClass._currentQuality + " to " + label + ". Calling default reload.");
-      paella.player.reloadVideos(reso, reso2);
-    }
-    thisClass._currentQuality = label;
+  
+  checkEnabled: function (onSuccess) {
+    onSuccess(! paella.player.isLiveStream() && ! paella.player.videoContainer.isMonostream);
   },
-
+  
+  
+  /**
+   * Called directly by qualitiesPresentationPlugin
+   * 1. if on single and mutli coming across, change to multi of passed res
+   * 2. if on multi and single coming accross, change to single and passed res
+   * 3. if on same data.type and different res change, change res
+   * 4. if on same data.type and same res, don't do anything
+   *
+   */
+  toggleResolution: function (data) {
+    var thisClass = this;
+    var defer = $.Deferred();
+    var sources = null;
+    var isSingle = paella.player.videoContainer.isMonostream;
+    if (! isSingle && data.type === paella.plugins.singleMultipleQualitiesPlugin.singleStreamLabel) {
+      thisClass._toggleMultiToSingleProfile(data);
+    } else if (isSingle && data.type === paella.plugins.singleMultipleQualitiesPlugin.multiStreamLabel) {
+      thisClass._toggleSingleToMultiProfile(data);
+    } else if (data.label === thisClass._currentQuality) {
+      base.log.debug("PO: no work needed, same quality " + data.label + ", reso:" + data.reso + ", reso2: " + data.reso2);
+      thisClass._reenableQualityLabel();
+    } else {
+      // no stream source change needed, just pause and change source index
+      paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
+        // pause videos to temporarily stop update timers
+        paella.player.videoContainer.pause().
+        then(function () {
+          thisClass._setQuality(data.index, !videoData.paused);
+        });
+      });
+    }
+    thisClass._currentQuality = data.label;
+  },
+  
   _getSources: function () {
     if (this._slave === null) {
       base.log.debug("PO: Getting  original stream sources");
       this._getStreamSources();
     }
   },
-
+  
   _firstLoadAction: function () {
     if (this._currentProfile === '') {
       base.log.debug("PO: first time load.");
@@ -104,141 +97,150 @@ Class ("paella.plugins.PresentationOnlyPlugin", paella.EventDrivenPlugin, {
       }
     }
   },
-
-  _toggleMultiToSingleProfile: function (reso, reso2) {
-    base.log.debug("PO: toggle from Multi to Single with resolution " + reso);
+  
+  _toggleMultiToSingleProfile: function (data) {
+    base.log.debug("PO: toggle from Multi to Single with resolution " + data.reso);
     var thisClass = this;
     var sources = null;
     this._getSources();
-    sources =[ {
-      data: thisClass._slave, type: thisClass._preferredMethodSlave
-    },
-    null];
-    thisClass._doToggle(sources, true, reso, reso2);
-    paella.plugins.viewModeTogglePlugin.turnOffVisibility();
+    sources =[thisClass._slave];
+    // update to use paella 5 promise on current time query
+    paella.player.videoContainer.currentTime().then(function (time) {
+      thisClass._doSourceToggle(sources, true, data, time);
+      paella.plugins.viewModeTogglePlugin.turnOffVisibility();
+    });
   },
-
-  _toggleSingleToMultiProfile: function (reso, reso2) {
-    base.log.debug("PO: toggle from Single to Multi with master " + reso + " and slave " + reso2);
+  
+  _toggleSingleToMultiProfile: function (data) {
+    base.log.debug("PO: toggle from Single to Multi with master " + data.reso + " and slave " + data.reso2);
     var thisClass = this;
     var sources = null;
     this._getSources();
-    sources =[ {
-      data: thisClass._master, type: thisClass._preferredMethodMaster
-    }, {
-      data: thisClass._slave, type: thisClass._preferredMethodSlave
-    }];
-    thisClass._doToggle(sources, false, reso, reso2);
-    paella.plugins.viewModeTogglePlugin.turnOnVisibility();
+    sources =[thisClass._master, thisClass._slave];
+    // using paella 5 promise on current time query
+    paella.player.videoContainer.currentTime().then(function (time) {
+      thisClass._doSourceToggle(sources, false, data, time);
+      paella.plugins.viewModeTogglePlugin.turnOnVisibility();
+    });
   },
-
-  _changeToPresentationOnlyStream: function (reso, reso2) {
-    this._swapTags();
-    paella.player.videoContainer.setMonoStreamMode();
-    paella.player.videoContainer.reloadVideos(reso, reso2);
-  },
-
-  _changeBacktoMutliStream: function (reso, reso2) {
-    paella.player.videoContainer.reloadVideos(reso, reso2);
-    paella.player.videoContainer.isSlaveReady = true;
-    paella.player.videoContainer.isMonostream = false;
-  },
-
-  _changePresentationResolution: function (reso, reso2) {
-    base.log.debug("PO: current master height (2) " + paella.player.videoContainer.currentMasterVideoData.res.h);
-    paella.player.videoContainer.reloadVideos(reso, reso2);
-  },
-
+  
   _triggerProfileUpdate: function () {
     // Trigger profile change to reset view
     paella.events.trigger(paella.events.setProfile, {
       profileName: this._currentProfile
     });
   },
-
-  _setSeekToTime: function(){
-   this._seekToThisTime = paella.player.videoContainer.currentTime();
-   this._isSeekToTime = true;
- },
-
-  _toggleSeekToTime: function() {
+  
+  _setSeekToTime: function (time) {
+    this._seekToThisTime = time;
+    this._isSeekToTime = true;
+  },
+  
+  _toggleSeekToTime: function () {
     if (this._isSeekToTime) {
       this._isSeekToTime = false;
       paella.player.videoContainer.seekToTime(this._seekToThisTime);
     }
   },
-
+  
+  _setQuality: function (qualityindex, wasPlaying) {
+    var self = this;
+    paella.player.videoContainer.setQuality(qualityindex).then(function () {
+      // reset the time
+      self._toggleSeekToTime();
+      self._reenableQualityLabel();
+      // ensure player view is resized
+      paella.player.onresize();
+      //start 'em up if needed
+      if (wasPlaying) {
+        paella.player.paused().then(function (stillPaused) {
+          if (stillPaused) {
+            paella.player.play();
+          }
+        });
+      }
+    },
+    function () {
+      console.log("PO: WARN - error during set quality inside");
+      console.log(error);
+    }).fail(function (error) {
+      console.log("PO: WARN - error during set quality outside");
+      console.log(error);
+    });
+  },
+  
   _getStreamSources: function () {
     var self = this;
-    var loader = paella.initDelegate.initParams.videoLoader;
-    self._preferredMethodMaster = loader.getPreferredMethod(0);
-    self._preferredMethodSlave = loader.getPreferredMethod(1);
+    var loader = paella.player.videoLoader;
     self._master = loader.streams[0];
     self._slave = loader.streams[1];
   },
-
-  _swapTags: function () {
-    var video1 = $('#' + paella.player.videoContainer.video1Id);
-    var video2 = $('#' + paella.player.videoContainer.video2Id);
-
-    video1.attr('id', paella.player.videoContainer.video2Id);
-    video2.attr('id', paella.player.videoContainer.video1Id);
-
-    video1.addClass('slaveVideo');
-    video1.removeClass('masterVideo');
-    video1.volume = 0;
-
-    video2.addClass('masterVideo');
-    video2.removeClass('slaveVideo');
-    video2.volume = 1;
-
-    var tempMaster = paella.player.videoContainer.currentMasterVideoRect;
-    paella.player.videoContainer.currentMasterVideoRect = paella.player.videoContainer.currentSlaveVideoRect;
-    paella.player.videoContainer.currentSlaveVideoRect = tempMaster;
-    base.log.debug("PO: swapped video1 and video2");
-  },
-
-  _doToggle: function (sources, isPresOnly, reso, reso2) {
+  
+  // in Paella5 setStreamData() loads master & slave videos, to they need to be unloaded first.
+  _doSourceToggle: function (sources, isPresOnly, data, currentTime) {
     var self = this;
     if (self._slave === null) {
       base.log.error("PO: Stream resources were not properly retrieved at set up");
       return;
     }
-    var isPaused = paella.player.videoContainer.paused();
-    self._setSeekToTime();
-    var currentMaster = paella.player.videoContainer.currentMasterVideoData;
-    if (sources !== null) {
-      base.log.debug("PO: Updating videoContainer object sources");
-      paella.player.videoContainer.setSources(sources[0], sources[1]);
+    var wasSingle = paella.player.videoContainer.isMonostream;
+    paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
+      self._setSeekToTime(videoData.currentTime);
+      // pause videos to temporarily stop update timers
+      paella.player.videoContainer.pause().
+      then(function () {
+        self._removeVideoNodes();
+        if (! wasSingle) {
+          // set the cookie to monostream so setStreamData correctly sets single stream initialization
+          base.cookies.set("lastProfile", self._presentationOnlyProfile);
+        }
+        if (sources !== null) {
+          base.log.debug("PO: Updating videoContainer object sources, this reloads the video container(s)");
+          paella.player.videoContainer.setStreamData(sources).then(function () {
+            console.log("PO: successfully set stream sources");
+            if (isPresOnly && ! wasSingle) {
+              base.log.debug("PO: Changing from multi to single stream, monostream on is " + paella.player.videoContainer.isMonostream);
+              // setStreamData has already loaded _presentationOnlyProfile from the cookie
+            } else if (! isPresOnly && wasSingle) {
+              base.log.debug("PO: Changing from single to multi-stream, monostream off is " + ! paella.player.videoContainer.isMonostream);
+              self._currentProfile = paella.player.config.defaultProfile;
+              self._triggerProfileUpdate();
+            } else {
+              base.log.debug("PO: WARN Unexpected toggle state.");
+            }
+            // reset the volume
+            paella.player.videoContainer.setVolume(videoData.volume).then(function () {
+              // finally, change the quality to index requested
+              self._setQuality(data.index, ! videoData.paused);
+            });
+          }).fail(function (error) {
+            console.log("PO: WARN - error during source reset");
+            console.log(error);
+          });
+        }
+      });
+    });
+  },
+  
+  // in Paella5, need to manually remove nodes before reseting video source data
+  _removeVideoNodes: function () {
+    var video1node = paella.player.videoContainer.container.getNode(paella.player.videoContainer.video1Id);
+    var video2node = paella.player.videoContainer.container.getNode(paella.player.videoContainer.video2Id);
+    // ensure swf object is removed
+    if (typeof swfobject !== "undefined") {
+      swfobject.removeSWF("playerContainer_videoContainer_1Movie");
     }
-
-    if (isPresOnly && ! self.isCurrentlySingleStream) {
-      base.log.debug("PO: Change to single-stream: current master res height (2) " + paella.player.videoContainer.currentMasterVideoData.res.h);
-      self._changeToPresentationOnlyStream(reso, reso2);
-      base.log.debug("PO: Is monostream " + paella.player.videoContainer.isMonostream);
-      // Change to single view
-      self._currentProfile = self._presentationOnlyProfile;
-      self._triggerProfileUpdate();
-    } else if (! isPresOnly && self.isCurrentlySingleStream) {
-      base.log.debug("PO: Change back to multi-stream: current master res height (2) " + paella.player.videoContainer.currentMasterVideoData.res.h);
-      self._changeBacktoMutliStream(reso, reso2);
-      base.log.debug("PO: Is monostream " + paella.player.videoContainer.isMonostream);
-      // change to default multi-view profile
-      self._currentProfile = paella.player.config.defaultProfile;
-      self._triggerProfileUpdate();
-    } else {
-      base.log.debug("PO: Just loading a different single-stream resolution: current master res height (2) " + paella.player.videoContainer.currentMasterVideoData.res.h);
-      self._changePresentationResolution(reso, reso2);
-      base.log.debug("PO: Is monostream " + paella.player.videoContainer.isMonostream);
+    paella.player.videoContainer.container.removeNode(video1node);
+    if (video2node) {
+      paella.player.videoContainer.container.removeNode(video2node);
     }
-
-    //start 'em up
-    if (!isPaused && paella.player.paused()) {
-      paella.events.trigger(paella.events.play);
+    base.log.debug("PO: removed video1 and video2 nodes");
+  },
+  
+  _reenableQualityLabel: function () {
+    if (paella.plugins.singleMultipleQualitiesPlugin) {
+      paella.plugins.singleMultipleQualitiesPlugin.turnOnVisibility();
     }
-
-    base.log.debug("PO: setting isPresOnly from " + self.isCurrentlySingleStream + "  to " + isPresOnly);
-    self.isCurrentlySingleStream = isPresOnly;
   }
 });
 

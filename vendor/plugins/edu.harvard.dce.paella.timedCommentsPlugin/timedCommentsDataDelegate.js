@@ -4,7 +4,7 @@ paella.dataDelegates.TimedCommentsDataDelegate = Class.create(paella.DataDelegat
   // stub to get the user's annotation name
   getMyName: function (context, params, onSuccess) {
     var series = params.series;
-    paella.ajax.get({
+    base.ajax.get({
       url: '/annotation/myname', params: {
         series: seriesId,
         type: "paella/" + context
@@ -36,7 +36,7 @@ paella.dataDelegates.TimedCommentsDataDelegate = Class.create(paella.DataDelegat
   },
 
   isCanAnnotate: function (context, episodeId, onSuccess) {
-    paella.ajax.get({
+    base.ajax.get({
       url: '/annotation/canAnnotate', params: {
         mediaPackageId: episodeId,
         type: "paella/" + context
@@ -53,7 +53,7 @@ paella.dataDelegates.TimedCommentsDataDelegate = Class.create(paella.DataDelegat
 
   getAnnotations: function (context, episodeId, ifModifiedByDate, onSuccess) {
     var commentResultsLimit = 30000; //set to large limit, default is 10
-    paella.ajax.get({
+    base.ajax.get({
       url: '/annotation/annotations.json', params: {
         limit: commentResultsLimit,
         episode: episodeId,
@@ -107,7 +107,7 @@ paella.dataDelegates.TimedCommentsDataDelegate = Class.create(paella.DataDelegat
     var isprivate = params.isprivate;
     if (typeof (value) == 'object') value = JSON.stringify(value);
 
-    paella.ajax.put({
+    base.ajax.put({
       url: '/annotation/',
       params: {
         episode: episodeId,
@@ -136,7 +136,7 @@ paella.dataDelegates.TimedCommentsDataDelegate = Class.create(paella.DataDelegat
     var annotationId = params.annotationId;
     if (typeof (value) == 'object') value = JSON.stringify(value);
 
-    paella.ajax.put({
+    base.ajax.put({
       url: '/annotation/' + annotationId, params: {
         value: value
       }
@@ -156,7 +156,7 @@ paella.dataDelegates.TimedCommentsDataDelegate = Class.create(paella.DataDelegat
   remove: function (context, params, onSuccess) {
     var episodeId = params.id;
 
-    paella.ajax.get({
+    base.ajax.get({
       url: '/annotation/annotations.json', params: {
         episode: episodeId, type: "paella/" + context
       }
@@ -167,7 +167,7 @@ paella.dataDelegates.TimedCommentsDataDelegate = Class.create(paella.DataDelegat
         if (!(annotations instanceof Array)) {
           annotations =[annotations];
         }
-        var asyncLoader = new paella.AsyncLoader();
+        var asyncLoader = new base.AsyncLoader();
         for (var i = 0; i < annotations.length;++ i) {
           var annotationId = data.annotations.annotation.annotationId;
           asyncLoader.addCallback(new paella.JSONCallback({

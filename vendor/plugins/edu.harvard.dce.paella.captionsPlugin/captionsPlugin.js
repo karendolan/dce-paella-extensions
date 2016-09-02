@@ -1,4 +1,4 @@
-Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
+Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 	_searchTimerTime:1500,
 	_searchTimer:null,
 	_pluginButton:null,
@@ -18,14 +18,18 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
 	_searchOnCaptions:null,
 
 	getAlignment:function() { return 'right'; },
-	getSubclass:function() { return 'captionsPluginButton'; },
+	getSubclass:function() { return 'dceCaptionsPluginButton'; },
 	getName:function() { return "edu.harvard.dce.paella.captionsPlugin"; },
 	getButtonType:function() { return paella.ButtonPlugin.type.popUpButton; },	
 	getDefaultToolTip:function() { return base.dictionary.translate("Captions"); },
 	getIndex:function() {return 509;},
 
 	checkEnabled:function(onSuccess) {
-		onSuccess(true);
+		if(paella.captions.getAvailableLangs().length > 0){
+		  onSuccess(true);
+		} else {
+		  onSuccess(false);
+		}
 	},
 
 	showUI: function(){
@@ -36,11 +40,6 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
 
 	setup:function() {
 		var self = this;
-
-		// HIDE UI IF NO Captions
-		if(!paella.captions.getAvailableLangs().length){
-			paella.plugins.captionsPlugin.hideUI();
-		}
 
 		//BINDS
 		paella.events.bind(paella.events.captionsEnabled,function(event,params){
@@ -132,7 +131,7 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
 		});
 
 		var x = parseInt(resul / 280);
-		$(".captionsBody").scrollTop( x*thisClass._defaultBodyHeight );
+		$(".dceCaptionsBody").scrollTop( x*thisClass._defaultBodyHeight );
 	},
 
 	onCaptionAdded:function(obj){
@@ -185,22 +184,26 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
 		}
 	},
 
-	action: function () {
-    this._browserLang = base.dictionary.currentLanguage();
-    this._autoScroll = true;
+	action:function(){
+		var self = this;
+		self._browserLang = base.dictionary.currentLanguage();
+		self._autoScroll = true;
 
-    if (this._open) {
-      this._open = false;
-      paella.keyManager.enabled = true;
-    }
-    else {
-      this._open = true;
+		switch(self._open){
+			case 0:
+				if(self._browserLang && paella.captions.getActiveCaptions()==undefined){
+					self.selectDefaultBrowserLang(self._browserLang);
+				}
+				self._open = 1;
+				paella.keyManager.enabled = false;
+				break;
+		
+			case 1: 
+				paella.keyManager.enabled = true;
+				self._open = 0;
+				break;
+		}
 
-      if (this._browserLang && !paella.captions.getActiveCaptions()) {
-        this.selectDefaultBrowserLang(this._browserLang);
-      }
-      paella.keyManager.enabled = false;
-    }
 	},
 
 	buildContent:function(domElement) {
@@ -211,11 +214,11 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
         thisClass._parent.className = 'captionsPluginContainer';  
 	    //captions BAR
 	   	thisClass._bar = document.createElement('div');
-        thisClass._bar.className = 'captionsBar';
+        thisClass._bar.className = 'dceCaptionsBar';
         //captions BODY
         if(thisClass._searchOnCaptions){
 	        thisClass._body = document.createElement('div');
-	        thisClass._body.className = 'captionsBody';
+	        thisClass._body.className = 'dceCaptionsBody';
 	        thisClass._parent.appendChild(thisClass._body);
 	         //BODY JQUERY
 	        $(thisClass._body).scroll(function(){
@@ -248,8 +251,6 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
 			});
 	    }
 
-	        
-
       //SELECT
       thisClass._select = document.createElement("select");
       thisClass._select.className = "captionsSelector";
@@ -279,7 +280,7 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
         $(thisClass._select).change(function(){
 	       thisClass.changeSelection();
         });
-
+        
         //BUTTON EDITOR
         thisClass._editor = document.createElement("button");
         thisClass._editor.className = "editorButton";
@@ -399,4 +400,4 @@ Class ("paella.plugins.CaptionsPlugin", paella.ButtonPlugin,{
     }
 });
 
-paella.plugins.captionsPlugin = new paella.plugins.CaptionsPlugin();
+paella.plugins.captionsPlugin = new paella.plugins.DceCaptionsPlugin();

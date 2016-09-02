@@ -23,7 +23,7 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
     return base.dictionary.translate("Show comments");
   },
   getName: function () {
-    return "es.upv.paella.timedCommentsHeatmapPlugin";
+    return "edu.harvard.dce.paella.timedCommentsHeatmapPlugin";
   },
   getButtonType: function () {
     return paella.ButtonPlugin.type.timeLineButton;
@@ -34,8 +34,8 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
     var thisClass = this;
 
     // Get the client side offset to the server side date
-    if (paella.matterhorn.me && paella.matterhorn.me.timestamp) {
-      thisClass.ifModifiedSinceClientOffset = (new Date()) - paella.matterhorn.me.timestamp;
+    if (paella.opencast.me && paella.opencast.me.timestamp) {
+      thisClass.ifModifiedSinceClientOffset = (new Date()) - paella.opencast.me.timestamp;
     } else {
       thisClass.ifModifiedSinceServerDate = 0;
     }
@@ -113,12 +113,14 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
   refreshPrints: function (annotData) {
     var thisClass = this;
     if (annotData) {
-      thisClass.loadfootPrintData(annotData, status);
-      if (paella.events.refreshTimedComments) {
-        paella.events.trigger(paella.events.refreshTimedComments, {
-          data: annotData
-        });
-      }
+      paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
+        thisClass.loadfootPrintData(annotData, status, videoData);
+        if (paella.events.refreshTimedComments) {
+          paella.events.trigger(paella.events.refreshTimedComments, {
+            data: annotData
+          });
+        }
+      });
     }
   },
 
@@ -154,13 +156,15 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
         base.log.debug("TC Refreshing prints, found " + (data ? data.length: 0));
         thisClass.refreshPrints(data);
       } else {
-        thisClass.loadfootPrintData(data, status);
+        paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
+          thisClass.loadfootPrintData(data, status, videoData);
+        });
       }
       thisClass.ifModifiedSinceDate = lastRequestDateStr;
     });
   },
 
-  loadfootPrintData: function (annotations, status) {
+  loadfootPrintData: function (annotations, status, videoData) {
     var thisClass = this;
     var footPrintData = {
     };
@@ -168,7 +172,7 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
       annotations = JSON.parse(annotations);
     }
     var data = thisClass.makeHeatmapData(annotations);
-    var duration = Math.floor(paella.player.videoContainer.duration());
+    var duration = Math.floor(videoData.duration);
     var trimStart = Math.floor(paella.player.videoContainer.trimStart());
 
     var lastPosition = -1;
@@ -209,12 +213,15 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
     thisClass.drawcommentHeatmap(footPrintData);
     // Make the heatmap hot (seek onclick)
     $("#commentHeatmapCanvas").click(function (e) {
-      var offset = $(this).offset();
-      var relX = e.pageX - offset.left;
-      var relWidth = parseInt($(this).css('width')) | 1;
-      var dur = paella.player.videoContainer.duration() | 0;
-      var seekTo = parseInt((relX / relWidth) * dur);
-      paella.player.videoContainer.seekToTime(seekTo);
+      var self = this;
+      paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
+        var offset = $(self).offset();
+        var relX = e.pageX - offset.left;
+        var relWidth = parseInt($(self).css('width')) | 1;
+        var dur = videoData.duration | 0;
+        var seekTo = parseInt((relX / relWidth) * dur);
+        paella.player.videoContainer.seekToTime(seekTo);
+      });
     });
   },
 

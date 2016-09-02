@@ -24,7 +24,7 @@ paella.plugins.TabBarHandoutDownloadPlugin = Class.create(paella.TabBarPlugin, {
     },
     checkEnabled: function (onSuccess) {
         // retrieve any attached handouts (type "attachment/notes")
-        var attachments = paella.matterhorn.episode.mediapackage.attachments.attachment;
+        var attachments = paella.opencast.episode.mediapackage.attachments.attachment;
         if (!(attachments instanceof Array)) {
             attachments =[attachments];
         }

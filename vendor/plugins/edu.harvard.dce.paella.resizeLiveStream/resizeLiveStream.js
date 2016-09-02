@@ -3,20 +3,11 @@ Class ("paella.plugins.ResizeLiveStream",paella.EventDrivenPlugin,{
     return "edu.harvard.dce.paella.resizeLiveStream";
   },
 
-  setup: function() {
-    if (paella.player.isLiveStream()){
-      var thisClass = this;
-      window.setTimeout( function() {
-        thisClass.resizeStreamingContainer();
-      }, 200);
-    }
-  },
-
   getEvents: function() {
     return [paella.events.resize];
   },
 
-  resizeStreamingContainer: function() {
+  resizeStreamingContainer: function(videoData) {
    var optimalWidth;
     var optimalHeight;
     var videoContainer = $('#playerContainer_videoContainer_container');
@@ -24,7 +15,7 @@ Class ("paella.plugins.ResizeLiveStream",paella.EventDrivenPlugin,{
     var containerWidth = videoContainer.width();
     var containerHeight = videoContainer.height();
 
-    var streamRes = paella.player.videoContainer.currentMasterVideoData.res;
+    var streamRes = videoData.res;
 
     var newMaxWidth = (streamRes.w * containerHeight) / streamRes.h;
     var newMaxHeight = (containerWidth * streamRes.h) / streamRes.w;
@@ -38,14 +29,18 @@ Class ("paella.plugins.ResizeLiveStream",paella.EventDrivenPlugin,{
     }
     var marginOffset = (containerHeight - optimalHeight) / 2;
 
-    $('object[data="player_streaming.swf"]').attr({
+    // Paella5 rtmp object tag identifier
+    $('#playerContainer_videoContainer_1Movie').attr({
       height: optimalHeight,
-      width: optimalWidth,
+      width: optimalWidth
     }).css({marginTop: marginOffset + 'px'});
   },
 
   onEvent: function(event, params){
-    this.resizeStreamingContainer();
+    var self = this;
+    paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
+      self.resizeStreamingContainer(videoData);
+    });
   },
 
   checkEnabled:function(onSuccess) {

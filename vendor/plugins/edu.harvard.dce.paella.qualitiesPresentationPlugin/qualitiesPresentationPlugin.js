@@ -1,9 +1,11 @@
 // based on es.upv.paella.multipleQualitiesPlugin, "paella.plugins.MultipleQualitiesPlugin"
-Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin, {
+Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
   currentUrl: null,
   currentMaster: null,
   currentSlave: null,
   currentLabel:'',
+  _currentQuality:null,
+  _available:[],
   availableMasters:[],
   availableSlaves:[],
   showWidthRes: null,
@@ -33,16 +35,45 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
     return 550;
   },
   getName: function () {
-    return "edu.harvard.edu.paella.presentationQualitiesPlugin";
+    return "edu.harvard.edu.paella.singleMultipleQualitiesPlugin";
   },
   getDefaultToolTip: function () {
     return base.dictionary.translate("Change video quality");
   },
+  
+  getEvents: function () {
+    // Inserting a new event types (used by DCE presentationOnlyPlugin)
+    paella.events.donePresenterOnlyToggle = "dce:donePresenterOnlyToggle";
+    return[paella.events.donePresenterOnlyToggle];
+  },
+  
+  onEvent: function (eventType, params) {
+    this.turnOnVisibility();
+  },
 
-  checkEnabled: function (onSuccess) {
+  checkEnabled:function(onSuccess) {
+     var This = this;
+     paella.player.videoContainer.getQualities()
+       .then(function(q) {
+         This._available = q;
+         onSuccess(q.length>1);
+     });
+   },
+
+   setup:function() {
+     var This = this;
+     This.initData();
+     This.setQualityLabel();
+     //config
+     This.showWidthRes = (This.config.showWidthRes !== undefined) ? This.config.showWidthRes: true;
+     paella.events.bind(paella.events.qualityChanged, function(event) { This.setQualityLabel(); });
+   },
+
+  initData: function () {
     var key, j;
-    this.currentMaster = paella.player.videoContainer.currentMasterVideoData;
-    this.currentSlave = paella.player.videoContainer.currentSlaveVideoData;
+    var container = paella.player.videoContainer.getNode("playerContainer_videoContainer_container");
+    this.currentMaster = container.getNode("playerContainer_videoContainer_1");
+    this.currentSlave = container.getNode("playerContainer_videoContainer_2");
 
     var minVerticalRes = parseInt(this.config.minVerticalRes);
     var maxVerticalRes = parseInt(this.config.maxVerticalRes);
@@ -51,11 +82,15 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
     }
 
     // Search for the resolutions
-    var allMasterSources = paella.player.videoContainer.masterVideoData.sources;
+    var allMasterSources = paella.player.videoContainer.sourceData[0].sources;
 
     for (key in allMasterSources) {
-      for (j = 0; j < allMasterSources[key].length;++ j) {
-        if ((allMasterSources[key][j].type == this.currentMaster.type)) {
+      // This assumes the video container has a streamname attribute (i.e. 'rtmp', 'mp4', etc)
+      // Note: this does not differentiate between "rtmp" stream sub-types of video/x-flv, video/mp4, etc.
+      // Note: this only separates stream sources, such as "rtmp", "mp4", etc.
+      // This may need to be revisited to filter out stream source types of "hls", "mpd", etc.
+      if (key === this.currentMaster._streamName) {
+        for (j = 0; j < allMasterSources[key].length;++ j) {
           if ((isNaN(minVerticalRes) == false) && (parseInt(allMasterSources[key][j].res.h) < minVerticalRes)) {
             continue;
           }
@@ -67,10 +102,10 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
       }
     }
     if (this.currentSlave) {
-      var allSlaveSources = paella.player.videoContainer.slaveVideoData.sources;
+      var allSlaveSources = paella.player.videoContainer.sourceData[1].sources;
       for (key in allSlaveSources) {
         for (j = 0; j < allSlaveSources[key].length;++ j) {
-          if ((allSlaveSources[key][j].type == this.currentSlave.type)) {
+          if ((allSlaveSources[key][j].type.split("/")[1] == this.currentSlave._streamName)) {
             if ((isNaN(minVerticalRes) == false) && (parseInt(allSlaveSources[key][j].res.h) < minVerticalRes)) {
               continue;
             }
@@ -93,29 +128,6 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
     this.availableMasters.sort(sortfunc);
     this.availableSlaves.sort(sortfunc);
 
-    var isenabled = (this.availableMasters.length > 1 || this.availableSlaves.length > 1);
-    onSuccess(isenabled);
-  },
-
-  setup: function () {
-    var self = this;
-    //RELOAD EVENT
-    paella.events.bind(paella.events.singleVideoReady, function (event, params) {
-      self.turnOnVisibility();
-      self.setQualityLabel();
-    });
-
-    if (base.dictionary.currentLanguage() == "es") {
-      var esDict = {
-        'Presenter': 'Presentador',
-        'Slide': 'Diapositiva'
-      };
-      base.dictionary.addDictionary(esDict);
-    }
-    this.setQualityLabel();
-
-    //config
-    self.showWidthRes = (self.config.showWidthRes !== undefined) ? self.config.showWidthRes: true;
   },
 
   getButtonType: function () {
@@ -123,6 +135,15 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
   },
 
   buildContent: function (domElement) {
+    var This = this;
+    paella.player.videoContainer.getCurrentQuality()
+      .then(function(q) {
+      This._currentQuality = q;
+      This._buildContent(domElement);
+   });
+  },
+  
+  _buildContent: function (domElement) {
     var self = this;
     self._domElement = domElement;
     var w, h, d, e, b = 0;
@@ -159,10 +180,10 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
       h = availableSlaves[i].res.h;
       reso = w + "x" + h;
       if (this.showWidthRes) {
-        this._domElement.appendChild(this.getItemButton(this.singleStreamLabel, reso, reso, reso));
+        this._domElement.appendChild(this.getItemButton(this.singleStreamLabel, reso, reso, reso, i));
       }
       else {
-        this._domElement.appendChild(this.getItemButton(this.singleStreamLabel, h + "p", reso, reso));
+        this._domElement.appendChild(this.getItemButton(this.singleStreamLabel, h + "p", reso, reso, i));
       }
     }
   },
@@ -195,15 +216,15 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
         }
       }
       if (this.showWidthRes) {
-        this._domElement.appendChild(this.getItemButton(this.multiStreamLabel, w + "x" + h, w + "x" + h, reso2));
+        this._domElement.appendChild(this.getItemButton(this.multiStreamLabel, w + "x" + h, w + "x" + h, reso2, i));
       }
       else {
-        this._domElement.appendChild(this.getItemButton(this.multiStreamLabel, h + "p", w + "x" + h, reso2));
+        this._domElement.appendChild(this.getItemButton(this.multiStreamLabel, h + "p", w + "x" + h, reso2, i));
       }
     }
   },
 
-  getCurrentResType: function() {
+  getCurrentResType:function() {
     if (paella.player.videoContainer.isMonostream) {
       return this.singleStreamLabel;
     }  else {
@@ -211,16 +232,16 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
     }
   },
 
-  getCurrentResLabel: function() {
+  getCurrentResLabel:function() {
       if (this.showWidthRes) {
-        return paella.player.videoContainer.currentMasterVideoData.res.w + "x" + paella.player.videoContainer.currentMasterVideoData.res.h;
+        return this._currentQuality.res.w + "x" + this._currentQuality.res.h;
       }
       else {
-         return paella.player.videoContainer.currentMasterVideoData.res.h + "p";
+         return this._currentQuality.shortLable();
       }
   },
 
-  getItemButton: function (type, label, reso, reso2) {
+  getItemButton: function (type, label, reso, reso2, index) {
     var elem = document.createElement('div');
     if (this._isCurrentRes(label, type)) {
       elem.className = this.getButtonItemClass(label, true);
@@ -230,6 +251,7 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
     elem.id = label + '_button';
     elem.innerHTML = label;
     elem.data = {
+      index: index,
       type: type,
       label: label,
       reso: reso,
@@ -238,54 +260,49 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
     };
     if (type !== label) {
       $(elem).click(function (event) {
-        this.data.plugin.onItemClick(this, this.data.label, this.data.reso, this.data.reso2, this.data.type);
+        this.data.plugin.onItemClick(elem.data);
+        $('.multipleQualityItem').removeClass('selected');
+        $(this).addClass('selected');
       });
     }
     return elem;
   },
 
-  onItemClick: function (button, label, reso, reso2, type) {
+  onItemClick: function (data) {
     var self = this;
-    // Ensure quality label is current before testing res change
-    self.setQualityLabel();
-    var isSameRes =  self._isCurrentRes(label, type);
-
-    paella.events.trigger(paella.events.hidePopUp, {
-      identifier: this.getName()
-    });
-
-    // disapear until the new res is loaded
-    self.turnOffVisibility();
+    paella.player.controls.hidePopUp(self.getName());
 
     if (typeof paella.plugins.presentationOnlyPlugin !== "undefined") {
-      paella.plugins.presentationOnlyPlugin.toggleResolution(label, reso, reso2, type);
+      // disapear the button until the new res is loaded, toggleResolutions turns it on directly when it's safe to use again
+      self.turnOffVisibility();
+      paella.plugins.presentationOnlyPlugin.toggleResolution(data, self.turnOnVisibility);
       self._isCurrentlySingleStream = paella.plugins.presentationOnlyPlugin.isCurrentlySingleStream;
     } else {
-      paella.player.reloadVideos(reso, reso2);
+      paella.player.videoContainer.setQuality(data.index)
+        .then(function() {
+          self.setQualityLabel();
+      });
     }
 
     var arr = self._domElement.children;
     for (var i = 0; i < arr.length; i++) {
       arr[i].className = self.getButtonItemClass(i, false);
     }
-    button.className = self.getButtonItemClass(i, true);
-    base.log.debug("selected button " + button.innerText + ", label is " + this.currentLabel);
-    // finally, re-enable plugin if no reload is expected
-    if (isSameRes) {
-      self.turnOnVisibility();
-    }
   },
-
-  setQualityLabel: function () {
-    var postfix = '';
-    var res = paella.player.videoContainer.currentMasterVideoData.res;
-    base.log.debug("current master res height" + res.h);
-    this.setText(res.h + "p");
-    this.currentLabel = res.h + "p";
+  
+  // paella5 style
+  setQualityLabel:function() {
+    var This = this;
+    paella.player.videoContainer.getCurrentQuality()
+      .then(function(q) {
+      This.setText(q.shortLabel());
+      This.currentLabel = q.shortLabel();
+      This._currentQuality = q;
+   });
   },
 
   getButtonItemClass: function (profileName, selected) {
-    return 'multipleQualityItem ' + profileName + ((selected) ? ' selected': '');
+    return 'multipleQualityItemDce ' + profileName + ((selected) ? ' selected': '');
   },
 
   turnOffVisibility: function(){
@@ -297,11 +314,13 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
   turnOnVisibility: function(){
     this.config.visibleOn = undefined;
     this.checkVisibility();
+    this.setQualityLabel();
   },
 
   _isCurrentRes: function(label, type) {
     var currentResLabel = this.getCurrentResLabel();
     var currentResType = this.getCurrentResType();
+    console.log("DCE-DEBUG - label:" + label + ", curLabel:" + currentResLabel + " type:" + type + ", curreType:" + currentResType);
     if (label ===  currentResLabel && type === currentResType) {
       return true;
     } else {
@@ -310,7 +329,7 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
   },
 
   _isFiltered: function () {
-    var track1Data = paella.matterhorn.episode.mediapackage.media.track[0];
+    var track1Data = paella.opencast._episode.mediapackage.media.track[0];
     if (track1Data && track1Data.tags &&  track1Data.tags.tag && !track1Data.tags.tag.contains(this._presenterHasAudioTag)) {
         base.log.debug("Not providing the presentation-only view because media is not tagged with " + this._presenterHasAudioTag);
         return true;
@@ -320,4 +339,4 @@ Class ("paella.plugins.MultiplePresentationQualitiesPlugin", paella.ButtonPlugin
 
 });
 
-paella.plugins.multipleQualitiesPlugin = new paella.plugins.MultiplePresentationQualitiesPlugin();
+paella.plugins.singleMultipleQualitiesPlugin = new paella.plugins.SingleMultipleQualitiesPlugin();

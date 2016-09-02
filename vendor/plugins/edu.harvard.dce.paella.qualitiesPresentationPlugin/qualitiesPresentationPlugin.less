@@ -1,21 +1,8 @@
-/*.showMultipleQualitiesPlugin {
-	background-image: url(advanced_button.png);
-	background-size: 300%;
-}
-
-.buttonPluginPopUp.showMultipleQualitiesPlugin {
-	background-image:none;
-}
-
-.selectQuality {
-	padding: 10px;
-}*/
-
 .buttonPlugin.showMultipleQualitiesPlugin {
 	text-align: center;
 	background-position: -600% -100%;
 	font-size: 0.8em;
-	line-height: @playbackBarButtonHeight;
+	line-height: @playbackBarButtonHeightPx;
 }
 
 .buttonPluginPopUp.showMultipleQualitiesPlugin {
@@ -26,14 +13,14 @@
 	padding: 10px;
 }
 
-.multipleQualityItem {
+.multipleQualityItemDce {
 	font-size: 19px;
-	padding-top: 3px;
-	padding-bottom: 3px;
 	cursor: pointer;
 	border-bottom: 1px solid #282828;
 	border-top: 1px solid #444;
 	white-space: nowrap;
+	font-size: 1em;
+  padding: 0 0.25em;
 }
 
 #SINGLESTREAM_button, #MULTISTREAM_button {
@@ -45,15 +32,15 @@
 	cursor: default;
 }
 
-.multipleQualityItem:hover {
+.multipleQualityItemDce:hover {
 	background-color: @hoverBackgroundColor;
 }
 
-.multipleQualityItem.selected {
+.multipleQualityItemDce.selected {
 	/* color:@mainColor; */
   color: #51c0ff;
 }
 
-.multipleQualityItem.selected:hover {
+.multipleQualityItemDce.selected:hover {
 	color:@popup_text_color;
 }

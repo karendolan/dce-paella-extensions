@@ -25,7 +25,7 @@ Class ("paella.plugins.handoutDownloadPlugin", paella.ButtonPlugin,{
         // retrieve any attached handouts (type "attachment/notes")
         // FYI, live events do not contain the attachments section
         if (this.pathExists(paella, this._attachmentPath)) {
-          var attachments = paella.matterhorn.episode.mediapackage.attachments.attachment;
+          var attachments = paella.opencast.episode.mediapackage.attachments.attachment;
           if (!(attachments instanceof Array)) {
             attachments =[attachments];
           }

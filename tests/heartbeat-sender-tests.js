@@ -4,6 +4,11 @@ var callNextTick = require('call-next-tick');
 var url = require('url');
 var reload = require('require-reload')(require);
 
+var Promise = require('bluebird');
+var mockCurrentTimePromise = function() {
+  return Promise.resolve(300);
+}
+
 var modulePath = '../vendor/plugins/edu.harvard.dce.paella.heartbeatSender/heartbeat_sender';
 
 // !! These tests require global mocks.
@@ -17,12 +22,12 @@ var mockPaellaObject = {
   player: {
     videoIdentifier: 'the-video-identifier',
     videoContainer: {
-      currentTime: mockCurrentTime,
+      currentTime: mockCurrentTimePromise,
       trimStart: mockTrimStart,
       paused: mockPaused
     }
   },
-  matterhorn: {
+  opencast: {
     resourceId: '/2015/03/33383/L10'
   }
 };
@@ -127,20 +132,21 @@ function setUpAssertingMocks(t) {
       'id query param is set to the value of paella.player.videoIdentifier.'
     );
     t.equal(query.type, 'HEARTBEAT', 'type query param is correct.');
+
     t.equal(
-      parseInt(query.in, 10),
-      mockCurrentTime() + mockTrimStart(),
+      parseInt(query['in'], 10),
+      (mockCurrentTime() + mockTrimStart()),
       '"in" query param is set to currentTime + trimStart.'
     );
     t.equal(
       parseInt(query.out, 10),
-      mockCurrentTime() + mockTrimStart(),
+      (mockCurrentTime() + mockTrimStart()),
       '"out" query param is also set to currentTime + trimStart.'
     );
     t.equal(
       query.resource,
-      mockPaellaObject.matterhorn.resourceId,
-      'resource query param is set to the value of paella.matterhorn.resourceId.'
+      mockPaellaObject.opencast.resourceId,
+      'resource query param is set to the value of paella.opencast.resourceId.'
     );
 
     var timestamp = new Date(query._);
