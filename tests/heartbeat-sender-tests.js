@@ -24,7 +24,8 @@ var mockPaellaObject = {
     videoContainer: {
       currentTime: mockCurrentTimePromise,
       trimStart: mockTrimStart,
-      paused: mockPaused
+      paused: mockPaused,
+      masterVideo: mockMasterVideo
     }
   },
   opencast: {
@@ -219,6 +220,18 @@ function mockPaused() {
 function mockPausedIsTrue() {
   return true;
 }
+
+function mockGetVideoData() {
+  return Promise.resolve({
+    currentTime: 300,
+    paused: false
+   });
+}
+
+function mockMasterVideo() {
+  return {getVideoData: mockGetVideoData};
+}
+
 
 function tearDownGlobals() {
   delete global.location;
