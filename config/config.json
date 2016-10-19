@@ -21,7 +21,7 @@
       "requiresSubscription": false
     },
     "slidesMarks": {
-      "enabled": true,
+      "enabled": false,
       "color": "gray"
     }
   },
