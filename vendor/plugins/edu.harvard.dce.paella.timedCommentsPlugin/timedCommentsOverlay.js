@@ -704,11 +704,11 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
       month: "short", day: "2-digit",
       hour: 'numeric', minute: 'numeric', hour12: false
     };
-    // check Safari and mobile browser date format support
-    if (typeof Intl == 'object' && typeof Intl.NumberFormat == 'function') {
+    // check Safari (v9 & v10) and mobile browser date format support
+    if (typeof Intl == 'object' && typeof Intl.DateTimeFormat == 'function') {
       result = new Intl.DateTimeFormat("en-US", options).format(date);
     } else {
-      // browsers that don't support Intl
+      // browsers that don't support Intl.DateTimeFormat
       var day = date.getDate();
       var monthIndex = date.getMonth();
       var hour = ('00' + date.getHours()).slice(-2);
