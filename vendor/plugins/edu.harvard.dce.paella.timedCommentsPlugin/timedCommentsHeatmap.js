@@ -17,7 +17,10 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
     return "commentHeatmap comments";
   },
   getIndex: function () {
-    return 590;
+    return 450;
+  },
+  getMinWindowSize: function () {
+    return 550;
   },
   getDefaultToolTip: function () {
     return base.dictionary.translate("Show comments");
@@ -29,10 +32,20 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
     return paella.ButtonPlugin.type.timeLineButton;
   },
 
+  // comment heatmap needs to align with DCE CS50 style playback bar
+  resize: function(){
+    if (this.isEnabled && $("#playerContainer_controls_playback_playbackBar").length > 0) {
+      var offset = $("#playerContainer_controls_playback_playbackBar").offset();
+      var width = $("#playerContainer_controls_playback_playbackBar").width();
+      $(".commentHeatmapContainer").css("margin-left", offset.left + "px");
+      $(".commentHeatmapContainer").css("width", width + "px");
+    }
+  },
 
   setup: function () {
     var thisClass = this;
-
+    // Bind to window resize, 'paella.events.resize' does not capture window resize events
+    $(window).resize(function(event) { thisClass.resize(); });
     // Get the client side offset to the server side date
     if (paella.opencast.me && paella.opencast.me.timestamp) {
       thisClass.ifModifiedSinceClientOffset = (new Date()) - paella.opencast.me.timestamp;
@@ -211,6 +224,8 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
     }
 
     thisClass.drawcommentHeatmap(footPrintData);
+    // align with playback bar
+    thisClass.resize();
     // Make the heatmap hot (seek onclick)
     $("#commentHeatmapCanvas").click(function (e) {
       var self = this;

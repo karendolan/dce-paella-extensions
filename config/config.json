@@ -61,9 +61,6 @@
       "es.upv.paella.opencast.downloadsPlugin" : {
          "enabled":false
       },
-      "edu.harvard.dce.paella.tabBarHandoutDownloadPlugin" : {
-         "enabled":false
-      },
       "es.upv.paella.multipleQualitiesPlugin": {
         "enabled": false
       },
@@ -75,7 +72,7 @@
         "alwaysVisible": false
       },
       "es.upv.paella.TrimmingPlayerPlugin": {
-        "enabled": false
+        "enabled": true
       },
       "es.upv.paella.editor.TrimmingTrackPlugin": {
         "enabled": false
@@ -201,15 +198,6 @@
       },
       "edu.harvard.dce.paella.infoPlugin": {
         "enabled": true
-      },
-      "edu.harvard.dce.paella.autoHeaderHidePlugin": {
-        "enabled": true
-      },
-      "edu.harvard.dce.paella.autoBannerPlugin": {
-        "enabled": false
-      },
-      "edu.harvard.dce.paella.autoTitlePlugin": {
-        "enabled": false
       },
       "edu.harvard.dce.paella.add2xPlaybackChoice": {
         "enabled": true

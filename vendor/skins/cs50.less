@@ -35,6 +35,7 @@
 
 @playbackBarFontSize: 12px;
 
+
 body {
     background-color: #333;
 }
@@ -47,12 +48,18 @@ body {
   }
 }
 
-.buttonPluginPopUp{
+div.buttonPluginPopUp{
   background-color: #333;
   border: 1px solid #555;
+  bottom: 32px;
 }
 
-.playbackBar {
+div.playbackBar {
+  position:inherit;
+  top: auto;
+  bottom: auto;
+  right: auto;
+  left: auto;
   border: 1px solid #555;
 }
 
@@ -69,12 +76,24 @@ img#playerContainer_videoContainer_bkg{
   color: #555;
 }
 
-div#playerContainer_controls_playback_playbackBar{
-  background-image: linear-gradient(to bottom, #1f1f1f, #313131);
-  top: 17px;
-  border-radius: 5px;
-  right: 180px;
-  left: 200px;
+div#playerContainer_controls_playback_playbackBar {
+    position:inherit;
+    top: auto;
+    bottom: auto;
+    right: auto;
+    left: auto;
+    background-image: linear-gradient(to bottom, #1f1f1f, #313131);
+    border-radius: 5px;
+    flex: 0 1 100%;
+    margin: 8px 8px 0 0;
+    order: 2;
+}
+
+/* hide the playback bar when its too small to be useful */
+@media (max-width: 360px) {
+    div#playerContainer_controls_playback_playbackBar {
+        visibility:hidden;
+    }
 }
 
 div#playerContainer_controls_playback_playbackBar_full{
@@ -138,3 +157,30 @@ div#playerContainer_controls_playback_playbackBar_full{
 .reply_button .comments_entry_datepublish {
   color: #666;
 }
+
+/* #DCE start, CSS overrides to flexify the playback bar */
+/* Adding "div" to increase specificity to override the UPV Paella CSS */
+/* purpose: Flex column enable the player bar (i.e. playback bar more stretchy when less buttons are enabled) */
+
+div.playbackBarPlugins {
+    position:static;
+    top: auto;
+    bottom: auto;
+    right: auto;
+    left: auto;
+    display: flex;
+}
+
+div.buttonPlugin.right {
+    float:none;
+    flex: 0 0 auto;
+    order: 3;
+}
+
+div.buttonPlugin.left {
+    float:none;
+    flex: 0 0 auto;
+    order: 1;
+}
+
+/* #DCE end, CSS overrides to flexify the playback bar */

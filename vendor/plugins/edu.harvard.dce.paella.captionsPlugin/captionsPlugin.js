@@ -22,7 +22,7 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 	getName:function() { return "edu.harvard.dce.paella.captionsPlugin"; },
 	getButtonType:function() { return paella.ButtonPlugin.type.popUpButton; },	
 	getDefaultToolTip:function() { return base.dictionary.translate("Captions"); },
-	getIndex:function() {return 509;},
+	getIndex:function() {return 664;},
 
 	checkEnabled:function(onSuccess) {
 		if(paella.captions.getAvailableLangs().length > 0){

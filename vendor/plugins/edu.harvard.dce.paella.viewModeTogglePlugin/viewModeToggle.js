@@ -37,7 +37,7 @@ Class ("paella.plugins.ViewModeTogglePlugin",paella.ButtonPlugin,{
     }
   },
   getDefaultToolTip:function() { return base.dictionary.translate("Switch video layouts"); },
-  getIndex:function() { return 552; },
+  getIndex:function() { return 450; },
   getAlignment:function() { return 'right'; },
   getSubclass:function() { return "viewModeToggleButton"; },
   getName:function() { return "edu.harvard.dce.paella.viewModeTogglePlugin"; },

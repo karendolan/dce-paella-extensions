@@ -29,7 +29,7 @@ Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
     return "showMultipleQualitiesPlugin";
   },
   getIndex: function () {
-    return 2030;
+    return 448;
   },
   getMinWindowSize: function () {
     return 550;

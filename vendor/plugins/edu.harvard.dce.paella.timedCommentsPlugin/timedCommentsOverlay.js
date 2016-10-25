@@ -58,7 +58,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     onSuccess(true);
   },
   getIndex: function () {
-    return 1050;
+    return 449;
   },
   getName: function () {
     return "edu.harvard.dce.paella.timedCommentsOverlayPlugin";

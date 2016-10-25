@@ -4,7 +4,7 @@ Class ('paella.plugins.InfoPlugin', paella.ButtonPlugin,{
   _privacyPolicyLink: 'https://www.extension.harvard.edu/privacy-policy',
   getAlignment: function () { return 'right'; },
   getSubclass: function () { return "showInfoPluginButton"; },
-  getIndex: function () { return 501; },
+  getIndex: function () { return 665; },
   getMinWindowSize: function () { return 300; },
   getName: function () { return "edu.harvard.dce.paella.infoPlugin"; },
   checkEnabled: function (onSuccess) { onSuccess(true); },
