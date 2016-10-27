@@ -71,11 +71,8 @@
         "enabled": false,
         "alwaysVisible": false
       },
-      "es.upv.paella.TrimmingPlayerPlugin": {
+      "es.upv.paella.trimmingPlayerPlugin": {
         "enabled": true
-      },
-      "es.upv.paella.editor.TrimmingTrackPlugin": {
-        "enabled": false
       },
       "es.upv.paella.playPauseButtonPlugin": {
         "enabled": true
@@ -185,6 +182,9 @@
         "enabled": false
       },
       "edu.harvard.dce.paella.viewModeTogglePlugin": {
+        "enabled": true
+      },
+      "edu.harvard.dce.paella.singleVideoTogglePlugin": {
         "enabled": true
       },
       "es.upv.paella.socialPlugin": {
