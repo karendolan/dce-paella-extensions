@@ -25,7 +25,8 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 	getIndex:function() {return 664;},
 
 	checkEnabled:function(onSuccess) {
-		if(paella.captions.getAvailableLangs().length > 0){
+		// iphone uses it's own player and does not show caption overlay (but iPad does)
+		if(paella.captions.getAvailableLangs().length > 0 && !(navigator.userAgent.match(/(iPhone)/g))){
 		  onSuccess(true);
 		} else {
 		  onSuccess(false);

@@ -3,9 +3,8 @@ Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
   currentUrl: null,
   currentMaster: null,
   currentSlave: null,
-  currentLabel:'',
-  _currentQuality:null,
-  _available:[],
+  currentLabel: '',
+  _currentQuality: null,
   availableMasters:[],
   availableSlaves:[],
   showWidthRes: null,
@@ -40,34 +39,32 @@ Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
   getDefaultToolTip: function () {
     return base.dictionary.translate("Change video quality");
   },
-  
+
   getEvents: function () {
     // Inserting a new event types (used by DCE presentationOnlyPlugin)
     paella.events.donePresenterOnlyToggle = "dce:donePresenterOnlyToggle";
     return[paella.events.donePresenterOnlyToggle];
   },
-  
+
   onEvent: function (eventType, params) {
     this.turnOnVisibility();
   },
 
-  checkEnabled:function(onSuccess) {
-     var This = this;
-     paella.player.videoContainer.getQualities()
-       .then(function(q) {
-         This._available = q;
-         onSuccess(q.length>1);
-     });
-   },
+  checkEnabled: function (onSuccess) {
+    var This = this;
+    paella.player.videoContainer.getQualities().then(function (q) {
+      onSuccess(q.length > 1);
+    });
+  },
 
-   setup:function() {
-     var This = this;
-     This.initData();
-     This.setQualityLabel();
-     //config
-     This.showWidthRes = (This.config.showWidthRes !== undefined) ? This.config.showWidthRes: true;
-     paella.events.bind(paella.events.qualityChanged, function(event) { This.setQualityLabel(); });
-   },
+  setup: function () {
+    var This = this;
+    This.initData();
+    This.setQualityLabel();
+    //config
+    This.showWidthRes = (This.config.showWidthRes !== undefined) ? This.config.showWidthRes: true;
+    paella.events.bind(paella.events.qualityChanged, function (event) { This.setQualityLabel(); });
+  },
 
   initData: function () {
     var key, j;
@@ -127,7 +124,6 @@ Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
 
     this.availableMasters.sort(sortfunc);
     this.availableSlaves.sort(sortfunc);
-
   },
 
   getButtonType: function () {
@@ -136,13 +132,21 @@ Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
 
   buildContent: function (domElement) {
     var This = this;
-    paella.player.videoContainer.getCurrentQuality()
-      .then(function(q) {
+    paella.player.videoContainer.getCurrentQuality().then(function (q) {
       This._currentQuality = q;
       This._buildContent(domElement);
-   });
+    });
   },
-  
+
+  rebuildContent: function () {
+    var self = this;
+    self.availableMasters =[];
+    self.availableSlaves =[];
+    $(self._domElement).empty();
+    self.initData();
+    self._buildContent(self._domElement);
+  },
+
   _buildContent: function (domElement) {
     var self = this;
     self._domElement = domElement;
@@ -181,8 +185,7 @@ Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
       reso = w + "x" + h;
       if (this.showWidthRes) {
         this._domElement.appendChild(this.getItemButton(this.singleStreamLabel, reso, reso, reso, i));
-      }
-      else {
+      } else {
         this._domElement.appendChild(this.getItemButton(this.singleStreamLabel, h + "p", reso, reso, i));
       }
     }
@@ -217,28 +220,26 @@ Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
       }
       if (this.showWidthRes) {
         this._domElement.appendChild(this.getItemButton(this.multiStreamLabel, w + "x" + h, w + "x" + h, reso2, i));
-      }
-      else {
+      } else {
         this._domElement.appendChild(this.getItemButton(this.multiStreamLabel, h + "p", w + "x" + h, reso2, i));
       }
     }
   },
 
-  getCurrentResType:function() {
+  getCurrentResType: function () {
     if (paella.player.videoContainer.isMonostream) {
       return this.singleStreamLabel;
-    }  else {
+    } else {
       return this.multiStreamLabel;
     }
   },
 
-  getCurrentResLabel:function() {
-      if (this.showWidthRes) {
-        return this._currentQuality.res.w + "x" + this._currentQuality.res.h;
-      }
-      else {
-         return this._currentQuality.shortLable();
-      }
+  getCurrentResLabel: function () {
+    if (this.showWidthRes) {
+      return this._currentQuality.res.w + "x" + this._currentQuality.res.h;
+    } else {
+      return this._currentQuality.shortLable();
+    }
   },
 
   getItemButton: function (type, label, reso, reso2, index) {
@@ -278,9 +279,8 @@ Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
       paella.plugins.presentationOnlyPlugin.toggleResolution(data, self.turnOnVisibility);
       self._isCurrentlySingleStream = paella.plugins.presentationOnlyPlugin.isCurrentlySingleStream;
     } else {
-      paella.player.videoContainer.setQuality(data.index)
-        .then(function() {
-          self.setQualityLabel();
+      paella.player.videoContainer.setQuality(data.index).then(function () {
+        self.setQualityLabel();
       });
     }
 
@@ -289,39 +289,38 @@ Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
       arr[i].className = self.getButtonItemClass(i, false);
     }
   },
-  
+
   // paella5 style
-  setQualityLabel:function() {
+  setQualityLabel: function () {
     var This = this;
-    paella.player.videoContainer.getCurrentQuality()
-      .then(function(q) {
+    paella.player.videoContainer.getCurrentQuality().then(function (q) {
       This.setText(q.shortLabel());
       This.currentLabel = q.shortLabel();
       This._currentQuality = q;
-   });
+    });
   },
 
   getButtonItemClass: function (profileName, selected) {
     return 'multipleQualityItemDce ' + profileName + ((selected) ? ' selected': '');
   },
 
-  turnOffVisibility: function(){
+  turnOffVisibility: function () {
     paella.PaellaPlayer.mode.none = 'none';
-    this.config.visibleOn = [paella.PaellaPlayer.mode.none];
+    this.config.visibleOn =[paella.PaellaPlayer.mode.none];
     this.hideUI();
   },
 
-  turnOnVisibility: function(){
+  turnOnVisibility: function () {
     this.config.visibleOn = undefined;
     this.checkVisibility();
     this.setQualityLabel();
   },
 
-  _isCurrentRes: function(label, type) {
+  _isCurrentRes: function (label, type) {
     var currentResLabel = this.getCurrentResLabel();
     var currentResType = this.getCurrentResType();
     console.log("DCE-DEBUG - label:" + label + ", curLabel:" + currentResLabel + " type:" + type + ", curreType:" + currentResType);
-    if (label ===  currentResLabel && type === currentResType) {
+    if (label === currentResLabel && type === currentResType) {
       return true;
     } else {
       return false;
@@ -330,13 +329,12 @@ Class ("paella.plugins.SingleMultipleQualitiesPlugin", paella.ButtonPlugin, {
 
   _isFiltered: function () {
     var track1Data = paella.opencast._episode.mediapackage.media.track[0];
-    if (track1Data && track1Data.tags &&  track1Data.tags.tag && !track1Data.tags.tag.contains(this._presenterHasAudioTag)) {
-        base.log.debug("Not providing the presentation-only view because media is not tagged with " + this._presenterHasAudioTag);
-        return true;
+    if (track1Data && track1Data.tags && track1Data.tags.tag && ! track1Data.tags.tag.contains(this._presenterHasAudioTag)) {
+      base.log.debug("Not providing the presentation-only view because media is not tagged with " + this._presenterHasAudioTag);
+      return true;
     }
     return false;
   }
-
 });
 
 paella.plugins.singleMultipleQualitiesPlugin = new paella.plugins.SingleMultipleQualitiesPlugin();
