@@ -16,6 +16,8 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 	_defaultBodyHeight:280,
 	_autoScroll:true,
 	_searchOnCaptions:null,
+	_headerNoteKey:"automated",
+	_headerNoteMessage: "Automated Transcription - Provided by IBM Watson",
 
 	getAlignment:function() { return 'right'; },
 	getSubclass:function() { return 'dceCaptionsPluginButton'; },
@@ -295,7 +297,9 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 	        paella.userTracking.log("paella:caption:edit", {id: c._captionsProvider + ':' + c._id, lang: c._lang});
         	c.goToEdit();
         });
-
+        if (paella.dce && paella.dce.captiontags) {
+           thisClass._addTagHeader(thisClass._parent, paella.dce.captiontags);
+        }
         domElement.appendChild(thisClass._parent);
     },
 
@@ -398,6 +402,22 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 	        		paella.player.videoContainer.seekToTime(parseInt(secBegin));
 	        });
     	});
+    },
+
+    _addTagHeader: function(container, tags) {
+      var self = this;
+      if (!tags) return;
+      if ( ((Array.isArray && Array.isArray(tags)) || (tags instanceof Array)) == false) {
+        tags = [tags];
+      }
+      tags.forEach(function(t){
+        if (t == self._headerNoteKey) {
+           var messageDiv = document.createElement("div");
+           messageDiv.id = "dceCaptionNote";
+           messageDiv.innerHTML = self._headerNoteMessage;
+           $(container).prepend(messageDiv);
+        }
+      });
     }
 });
 
