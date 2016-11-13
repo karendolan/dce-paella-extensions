@@ -217,6 +217,10 @@
       },
       "es.upv.paella.captions.DFXPParserPlugin": {
         "enabled": true
+      },
+      "edu.harvard.dce.paella.iphonePluginDisablerPlugin": {
+        "enabled": true,
+        "actiondelay":200
       }
     }
   },
