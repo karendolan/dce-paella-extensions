@@ -18,6 +18,8 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 	_searchOnCaptions:null,
 	_headerNoteKey:"automated",
 	_headerNoteMessage: "Automated Transcription - Provided by IBM Watson",
+	_hasTranscriptText:null,
+	_noTextFoundMessage: "No text was found during transcription.",
 
 	getAlignment:function() { return 'right'; },
 	getSubclass:function() { return 'dceCaptionsPluginButton'; },
@@ -44,6 +46,19 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 	setup:function() {
 		var self = this;
 
+		self._activeCaptions = paella.captions.getActiveCaptions();
+
+		self._searchOnCaptions = self.config.searchOnCaptions || false;
+
+		// MATT-2219 #DCE Assume no caption text if first language has no caption text
+		var id = paella.captions.getAvailableLangs()[0].id;
+		self._hasTranscriptText = (paella.captions.getCaptions(id)._captions !== undefined);
+		if (!self._hasTranscriptText) {
+			// don't do binds when not transcode text to scroll
+			return;
+		}
+		// end  MATT-2219
+
 		//BINDS
 		paella.events.bind(paella.events.captionsEnabled,function(event,params){
 			self.onChangeSelection(params);
@@ -69,9 +84,6 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 			self.cancelHideBar();
 		});
 
-		self._activeCaptions = paella.captions.getActiveCaptions();
-
-		self._searchOnCaptions = self.config.searchOnCaptions || false;
 	},
 
 	cancelHideBar:function(){
@@ -206,6 +218,10 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 				self._open = 0;
 				break;
 		}
+		// MATT-2219 prevent activating the CC video overlay
+		if (!self._hasTranscriptText) {
+			paella.events.trigger(paella.events.captionsDisabled);
+		}
 
 	},
 
@@ -214,76 +230,28 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
 
 		//captions CONTAINER
 		thisClass._parent = document.createElement('div');
-        thisClass._parent.className = 'captionsPluginContainer';  
-	    //captions BAR
-	   	thisClass._bar = document.createElement('div');
-        thisClass._bar.className = 'dceCaptionsBar';
-        //captions BODY
-        if(thisClass._searchOnCaptions){
-	        thisClass._body = document.createElement('div');
-	        thisClass._body.className = 'dceCaptionsBody';
-	        thisClass._parent.appendChild(thisClass._body);
-	         //BODY JQUERY
-	        $(thisClass._body).scroll(function(){
-	        	thisClass._autoScroll = false;
-	        });
+		thisClass._parent.className = 'captionsPluginContainer';
+		//captions BAR
+		thisClass._bar = document.createElement('div');
+		thisClass._bar.className = 'dceCaptionsBar';
+		//captions BODY
+		if (thisClass._hasTranscriptText) {
+			// build caption search and select UI elements
+			if (thisClass._searchOnCaptions) {
+				thisClass.buildSearch();
+				thisClass.buildSelect();
+			}
+		} else {
+			// create the empty body
+			thisClass._body = document.createElement('div');
+			thisClass._body.className = 'dceCaptionsBody';
+			thisClass._parent.appendChild(thisClass._body);
+			thisClass._inner = document.createElement('div');
+			thisClass._inner.className = 'bodyInnerContainer';
+			thisClass._inner.innerHTML = thisClass._noTextFoundMessage;
+			thisClass._body.appendChild(thisClass._inner);
+		}
 
-	        //INPUT
-	        thisClass._input = document.createElement("input");
-	        thisClass._input.className = "captionsBarInput";
-	        thisClass._input.type = "text";
-	        thisClass._input.id ="captionsBarInput";
-	        thisClass._input.name = "captionsString";
-	        thisClass._input.placeholder = base.dictionary.translate("Search captions");
-	        thisClass._bar.appendChild(thisClass._input);
-
-	        //INPUT jQuery
-	         $(thisClass._input).change(function(){
-	        	var text = $(thisClass._input).val();
-	        	thisClass.doSearch(text);
-			});
-
-			$(thisClass._input).keyup(function(){
-				var text = $(thisClass._input).val();
-				if(thisClass._searchTimer != null){
-					thisClass._searchTimer.cancel();
-				}
-				thisClass._searchTimer = new base.Timer(function(timer) {
-					thisClass.doSearch(text);
-				}, thisClass._searchTimerTime);			
-			});
-	    }
-
-      //SELECT
-      thisClass._select = document.createElement("select");
-      thisClass._select.className = "captionsSelector";
-
-      var defOption = document.createElement("option"); // NO ONE SELECT
-      defOption.text = base.dictionary.translate("Off");
-      defOption.value = "";
-      thisClass._select.add(defOption);
-
-      var langs = paella.captions.getAvailableLangs();
-      if (Array.isArray(langs) && langs.length > 0) {
-        // In our case, there should only be one language.
-        // We are going to label it 'On', so that functionally, the select
-        // control behaves as an on/off switch for captions
-        // Later, when captions and transcripts are in separate plugins, this
-        // select control will be removed entirely.
-      	var option = document.createElement("option");
-      	option.text = base.dictionary.translate("On");
-      	option.value = langs[0].id;
-      	thisClass._select.add(option);
-      }
-
-         thisClass._bar.appendChild(thisClass._select);
-         thisClass._parent.appendChild( thisClass._bar);
-
-        //jQuery SELECT
-        $(thisClass._select).change(function(){
-	       thisClass.changeSelection();
-        });
-        
         //BUTTON EDITOR
         thisClass._editor = document.createElement("button");
         thisClass._editor.className = "editorButton";
@@ -302,6 +270,76 @@ Class ("paella.plugins.DceCaptionsPlugin", paella.ButtonPlugin,{
         }
         domElement.appendChild(thisClass._parent);
     },
+  buildSearch: function () {
+    var thisClass = this;
+    thisClass._body = document.createElement('div');
+    thisClass._body.className = 'dceCaptionsBody';
+    thisClass._parent.appendChild(thisClass._body);
+    //BODY JQUERY
+    $(thisClass._body).scroll(function () {
+      thisClass._autoScroll = false;
+    });
+
+    //INPUT
+    thisClass._input = document.createElement("input");
+    thisClass._input.className = "captionsBarInput";
+    thisClass._input.type = "text";
+    thisClass._input.id = "captionsBarInput";
+    thisClass._input.name = "captionsString";
+    thisClass._input.placeholder = base.dictionary.translate("Search captions");
+    thisClass._bar.appendChild(thisClass._input);
+
+    //INPUT jQuery
+    $(thisClass._input).change(function () {
+      var text = $(thisClass._input).val();
+      thisClass.doSearch(text);
+    });
+
+    $(thisClass._input).keyup(function () {
+      var text = $(thisClass._input).val();
+      if (thisClass._searchTimer != null) {
+        thisClass._searchTimer.cancel();
+      }
+      thisClass._searchTimer = new base.Timer(function (timer) {
+        thisClass.doSearch(text);
+      },
+      thisClass._searchTimerTime);
+    });
+  },
+
+  buildSelect: function () {
+    var thisClass = this;
+    //SELECT
+    thisClass._select = document.createElement("select");
+    thisClass._select.className = "captionsSelector";
+
+    var defOption = document.createElement("option");
+    // NO ONE SELECT
+    defOption.text = base.dictionary.translate("Off");
+    defOption.value = "";
+    thisClass._select.add(defOption);
+
+    var langs = paella.captions.getAvailableLangs();
+    if (Array.isArray(langs) && langs.length > 0) {
+      // In our case, there should only be one language.
+      // We are going to label it 'On', so that functionally, the select
+      // control behaves as an on/off switch for captions
+      // Later, when captions and transcripts are in separate plugins, this
+      // select control will be removed entirely.
+      var option = document.createElement("option");
+      option.text = base.dictionary.translate("On");
+      option.value = langs[0].id;
+      thisClass._select.add(option);
+    }
+
+    thisClass._bar.appendChild(thisClass._select);
+    thisClass._parent.appendChild(thisClass._bar);
+
+    //jQuery SELECT
+    $(thisClass._select).change(function () {
+      thisClass.changeSelection();
+    });
+  },
 
     selectDefaultBrowserLang:function(code){
     	var thisClass = this;
