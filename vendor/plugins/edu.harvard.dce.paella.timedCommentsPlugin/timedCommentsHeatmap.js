@@ -116,11 +116,11 @@ Class ("paella.plugins.timedCommentsHeatmapPlugin", paella.ButtonPlugin, {
         sender: this
       });
     }
-    thisClass.commentHeatmapTimer = new base.Timer(function (timer) {
-      thisClass.loadcommentHeatmap(true);
-    },
-    5000);
-    thisClass.commentHeatmapTimer.repeat = true;
+    //thisClass.commentHeatmapTimer = new base.Timer(function (timer) {
+    //  thisClass.loadcommentHeatmap(true);
+    //},
+    //5000);
+    //thisClass.commentHeatmapTimer.repeat = true;
   },
 
   refreshPrints: function (annotData) {

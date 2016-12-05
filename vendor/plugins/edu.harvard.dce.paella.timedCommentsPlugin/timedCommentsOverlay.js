@@ -35,6 +35,9 @@
 /* }
 /*
 /* */
+
+//var data = new Identicon('hash', 420).toString();
+//document.write('<img width=420 height=420 src="data:image/png;base64,' + data + '">');
 Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
   containerId: 'paella_plugin_TimedCommentsOverlay',
   container: null,
@@ -54,6 +57,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
   _prevProfile: null,//we store the profile we had before opening the annotation
   _optimalProfile: 'tiny_presentation',
   _userData: undefined,
+  _Identicon: null,
   checkEnabled: function (onSuccess) {
     onSuccess(true);
   },
@@ -181,10 +185,13 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     thisClass.sortAnnotations();
     
     paella.player.videoContainer.currentTime().then(function (time) {
-      thisClass.getUserData().then(function(userData) {
+      thisClass.getUserData().then(function (userData) {
         thisClass.drawTimedComments(time, userData);
       }).then(function () {
-        $("#innerAnnotation").animate({scrollTop: thisClass._curScrollTop}, 100);
+        $("#innerAnnotation").animate({
+          scrollTop: thisClass._curScrollTop
+        },
+        100);
         // changing the layout profile that is most optimal to show comments
         thisClass.changeToOptimalVideoProfile(thisClass._optimalProfile);
         thisClass._isActive = true;
@@ -315,11 +322,16 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     
     // append all to the overlay container
     overlayContainer.append(thisClass._rootElement);
+
+    // create the circle
+    var circle = document.createElement("div");
+    circle.id = "circle";
+    overlayContainer.append(circle);
     
     // update the comment time
     var currentTime = Math.floor(time);
     if ($('#tc_current_timestamp').length > 0) {
-      $('#tc_current_timestamp').html(paella.utils.timeParse.secondsToTime(currentTime));
+      $('#tc_current_timestamp').html(thisClass.getFriendlyTimeStamp(currentTime));
     } else {
       base.log.debug("TC Unable to find tc_current_timestamp. Cannot set current time for new comment.");
     }
@@ -352,18 +364,18 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     }
     
     // Halt comment refreshes when typing a comment or repy
-    $('.tc_reply_textarea, .tc_comment_textarea, .tc_admin_edit').focusin(function() {
+    $('.tc_reply_textarea, .tc_comment_textarea, .tc_admin_edit').focusin(function () {
       thisClass._isActive = false;
       // stop all typing leaks to underlying player
       paella.keyManager.enabled = false;
-    }).focusout(function() {
+    }).focusout(function () {
       thisClass._isActive = true;
       // re-enable typing leaks to underlying player
       paella.keyManager.enabled = true;
     });
     // stop keypress from leaking through to underlying div (video play/pause)
     $('.tc_reply_textarea, .tc_comment_textarea').keydown(function (event) {
-      var charCode = (typeof event.which == "number") ? event.which : event.keyCode;
+      var charCode = (typeof event.which == "number") ? event.which: event.keyCode;
       switch (charCode) {
         // spacebar event
         case 32:
@@ -382,7 +394,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     
     // prevent space bar event trickle pause/play & use enter for submit (short comments)
     $('.tc_reply_textarea, .tc_comment_textarea').keyup(function (event) {
-      var charCode = (typeof event.which == "number") ? event.which : event.keyCode;
+      var charCode = (typeof event.which == "number") ? event.which: event.keyCode;
       switch (event.keyCode) {
         // spacebar event, prevent click through
         case 32:
@@ -423,6 +435,12 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     innerAnnotation.id = "innerAnnotation";
     thisClass.innerContainer = innerAnnotation;
     var timeBlockcount = 0;
+    
+    var messageDiv = document.createElement("div");
+    messageDiv.id = "annotationHeaderNote";
+    messageDiv.innerHTML = "My Notes";
+    innerAnnotation.appendChild(messageDiv);
+    
     
     var newEl;
     var commentBlock;
@@ -469,7 +487,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
           var timeStampEl = document.createElement('div');
           timeStampEl.className = "tc_timestamp";
           timeStampEl.setAttribute('data-sec-begin-button', l.inpoint);
-          var timeStampText = paella.utils.timeParse.secondsToTime(l.inpoint);
+          var timeStampText = thisClass.getFriendlyTimeStamp(l.inpoint);
           timeStampEl.innerHTML = timeStampText;
           timeStampBlockEl.appendChild(timeStampEl);
           // jump to time on click on just the timestamp div
@@ -493,6 +511,8 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
         var friendlyDateStrig = thisClass.getFriendlyDate(comment.created);
         $(newEl).find(".tc_comment_text").html(comment.value);
         $(newEl).find(".user_name").html(comment.userName);
+        var identiconData = new Identicon(comment.userName, 420).toString();
+        $(newEl).find(".identicon").html('<img width=420 height=420 src="data:image/png;base64,' + identiconData + '">');
         $(newEl).find(".user_comment_date").html(friendlyDateStrig);
         $(commentBlock).append(newEl);
       }
@@ -535,12 +555,13 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
   },
   
   updateCurrentTimeStamp: function () {
+    var self = this;
     // updated to use new promise for current time
     paella.player.videoContainer.currentTime().then(function (time) {
       var currentTime = Math.floor(time);
       var currentTimeDiv = $('#tc_current_timestamp');
       if (currentTimeDiv) {
-        currentTimeDiv.html(paella.utils.timeParse.secondsToTime(currentTime));
+        currentTimeDiv.html(self.getFriendlyTimeStamp(currentTime));
       }
     });
   },
@@ -630,9 +651,10 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     thisClass._curScrollTop = $("#innerAnnotation").scrollTop();
     var txtValue = paella.AntiXSS.htmlEscape(thisClass.publishCommentTextArea.val());
     var isPrivate = thisClass.publishCommentisPrivate.val() === true ? true: false;
-
-    thisClass.getUserData().then( function(user){
-      var newComment = {};
+    
+    thisClass.getUserData().then(function (user) {
+      var newComment = {
+      };
       newComment.userName = user.username;
       newComment.mode = "comment";
       newComment.value = txtValue;
@@ -643,14 +665,14 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
       paella.player.videoContainer.currentTime().then(function (time) {
         thisClass.writeComment(data, time, isPrivate);
       });
-    }, 
+    },
     // else log issue
     base.log.debug("TC, unable to retrieve user information, cannot write comment"));
   },
   
-  writeComment: function(data, inPoint, isPrivate) {
+  writeComment: function (data, inPoint, isPrivate) {
     var thisClass = this;
-  	paella.player.videoContainer.currentTime().then(function (time) {
+    paella.player.videoContainer.currentTime().then(function (time) {
       paella.data.write('timedComments', {
         id: paella.initDelegate.getId(),
         inpoint: Math.floor(inPoint),
@@ -676,8 +698,9 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     var inPoint = commentBlock.attr("data-inpoint");
     
     // create the new reply
-    thisClass.getUserData().then( function(user){
-      var newComment = {};
+    thisClass.getUserData().then(function (user) {
+      var newComment = {
+      };
       newComment.userName = user.username;
       newComment.mode = "reply";
       newComment.value = txtValue;
@@ -687,7 +710,7 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
         timedComment: newComment
       };
       thisClass.writeComment(data, inPoint, isPrivate);
-    }, 
+    },
     // else log issue
     base.log.debug("TC, unable to retrieve user information, cannot write comment"));
   },
@@ -718,6 +741,22 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     return result;
   },
   
+  getFriendlyTimeStamp: function (seconds) {
+    var hrs = ~~(seconds / 3600);
+    var mins = ~~((seconds % 3600) / 60);
+    var secs = Math.floor(seconds % 60);
+    //if (hrs < 1 && mins < 1) {
+    //  return secs + "s";
+    //}
+    if (mins < 10) mins = '0' + mins;
+    if (secs < 10) secs = '0' + secs;
+    if (hrs < 1 ) {
+      return mins + ':' + secs;
+    }
+    if (hrs < 10) hrs = '0' + hrs;
+    return hrs + ':' + mins + ':' + secs;
+  },
+  
   getDomFromHTMLString: function (template) {
     var thisClass = this;
     parser = new DOMParser();
@@ -725,9 +764,9 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     // returns a HTMLDocument, which also is a Document.
   },
   // TODO: move these to template files
-  tc_comment: '<div class="tc_comment"><div class="tc_comment_text"></div><div class="tc_comment_data"><div class="user_icon"></div><div class="user_name"></div>, <div class="user_comment_date"></div></div></div>',
-  tc_reply: '<div class="tc_comment tc_reply"><div class="tc_comment_text tc_reply_text"></div><div class="tc_comment_data"><div class="user_icon"></div><div class="user_name"></div>, <div class="user_comment_date"></div></div></div>',
-  tc_reply_box: '<div class="tc_comment tc_reply_box"><form class="tc_new_reply_form" role="form"><input type="text" class="tc_reply_textarea" aria-label="reply text area" placeholder="Type a reply [enter to submit] 256 char" maxlength="256"></input></form></div>',
-  tc_new_comment: '<div class="tc_new_comment"><div id="tc_current_timestamp" class="tc_timestamp"></div><form class="tc_new_comment_form" role="form"><div class="tc_comment tc_comment_box"><input type="text" class="tc_comment_textarea" aria-label="Create a new comment" placeholder="Type new comment at the current time [enter to submit] 256 char" maxlength="256"></input><input type="hidden" id="tc_comment_private_checkbox" value="false" /></div></form></div>'
+  tc_comment: '<div class="identicon"></div><div class="tc_comment"><div class="tc_comment_text"></div><div class="tc_comment_data"><div class="user_icon"></div><div class="user_name"></div>, <div class="user_comment_date"></div></div></div>',
+  tc_reply: '<div class="identicon"></div><div class="tc_comment tc_reply"><div class="tc_comment_text tc_reply_text"></div><div class="tc_comment_data"><div class="user_icon"></div><div class="user_name"></div>, <div class="user_comment_date"></div></div></div>',
+  tc_reply_box: '<div class="identicon"></div><div class="tc_comment tc_reply_box"><form class="tc_new_reply_form" role="form"><input type="text" class="tc_reply_textarea" aria-label="reply text area" placeholder="Type a reply [enter to submit] 256 char" maxlength="256"></input></form></div>',
+  tc_new_comment: '<div class="identicon"></div><div class="tc_new_comment"><div id="tc_current_timestamp" class="tc_timestamp"></div><form class="tc_new_comment_form" role="form"><div class="tc_comment tc_comment_box"><input type="text" class="tc_comment_textarea" aria-label="Create a new comment" placeholder="Type new comment at the current time [enter to submit] 256 char" maxlength="256"></input><input type="hidden" id="tc_comment_private_checkbox" value="false" /></div></form></div>'
 });
 paella.plugins.timedCommentsOverlay = new paella.plugins.TimedCommentsOverlay();
