@@ -511,8 +511,10 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
         var friendlyDateStrig = thisClass.getFriendlyDate(comment.created);
         $(newEl).find(".tc_comment_text").html(comment.value);
         $(newEl).find(".user_name").html(comment.userName);
-        var identiconData = new Identicon(comment.userName, 420).toString();
-        $(newEl).find(".identicon").html('<img width=420 height=420 src="data:image/png;base64,' + identiconData + '">');
+        //var identiconData = new Identicon(comment.userName, 420).toString();
+        var identiconData = new Identicon(comment.userName + "KarenABGGGGGDEREKRKJJJJ", 120).toString();
+        $(newEl).find(".identicon").html('<img width=15 height=15 src="data:image/png;base64,' + identiconData + '">');
+        console.log("KAREN: " + comment.userName + ": " + identiconData);
         $(newEl).find(".user_comment_date").html(friendlyDateStrig);
         $(commentBlock).append(newEl);
       }
@@ -764,9 +766,9 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     // returns a HTMLDocument, which also is a Document.
   },
   // TODO: move these to template files
-  tc_comment: '<div class="identicon"></div><div class="tc_comment"><div class="tc_comment_text"></div><div class="tc_comment_data"><div class="user_icon"></div><div class="user_name"></div>, <div class="user_comment_date"></div></div></div>',
-  tc_reply: '<div class="identicon"></div><div class="tc_comment tc_reply"><div class="tc_comment_text tc_reply_text"></div><div class="tc_comment_data"><div class="user_icon"></div><div class="user_name"></div>, <div class="user_comment_date"></div></div></div>',
-  tc_reply_box: '<div class="identicon"></div><div class="tc_comment tc_reply_box"><form class="tc_new_reply_form" role="form"><input type="text" class="tc_reply_textarea" aria-label="reply text area" placeholder="Type a reply [enter to submit] 256 char" maxlength="256"></input></form></div>',
-  tc_new_comment: '<div class="identicon"></div><div class="tc_new_comment"><div id="tc_current_timestamp" class="tc_timestamp"></div><form class="tc_new_comment_form" role="form"><div class="tc_comment tc_comment_box"><input type="text" class="tc_comment_textarea" aria-label="Create a new comment" placeholder="Type new comment at the current time [enter to submit] 256 char" maxlength="256"></input><input type="hidden" id="tc_comment_private_checkbox" value="false" /></div></form></div>'
+  tc_comment: '<div class="tc_comment"><div class="tc_comment_text"></div><div class="identicon"></div><div class="tc_comment_data"><div class="user_name"></div>, <div class="user_comment_date"></div></div></div>',
+  tc_reply: '<div class="tc_comment tc_reply"><div class="tc_comment_text tc_reply_text"></div><div class="identicon"></div><div class="tc_comment_data"><div class="user_name"></div>, <div class="user_comment_date"></div></div></div>',
+  tc_reply_box: '<div class="tc_comment tc_reply_box"><form class="tc_new_reply_form" role="form"><input type="text" class="tc_reply_textarea" aria-label="reply text area" placeholder="Type a reply [enter to submit] 256 char" maxlength="256"></input></form></div>',
+  tc_new_comment: '<div class="tc_new_comment"><div id="tc_current_timestamp" class="tc_timestamp"></div><form class="tc_new_comment_form" role="form"><div class="tc_comment tc_comment_box"><input type="text" class="tc_comment_textarea" aria-label="Create a new comment" placeholder="Type new comment at the current time [enter to submit] 256 char" maxlength="256"></input><input type="hidden" id="tc_comment_private_checkbox" value="false" /></div></form></div>'
 });
 paella.plugins.timedCommentsOverlay = new paella.plugins.TimedCommentsOverlay();
