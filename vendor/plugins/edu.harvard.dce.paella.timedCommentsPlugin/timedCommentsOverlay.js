@@ -322,11 +322,13 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     
     // append all to the overlay container
     overlayContainer.append(thisClass._rootElement);
-
-    // create the circle
+    
+    // create the circle (actually not displaying circle any more in mockup)
     var circle = document.createElement("div");
     circle.id = "circle";
     overlayContainer.append(circle);
+    var vcMenu = $(thisClass.vc_menu);
+    overlayContainer.append(vcMenu);
     
     // update the comment time
     var currentTime = Math.floor(time);
@@ -511,10 +513,15 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
         var friendlyDateStrig = thisClass.getFriendlyDate(comment.created);
         $(newEl).find(".tc_comment_text").html(comment.value);
         $(newEl).find(".user_name").html(comment.userName);
-        //var identiconData = new Identicon(comment.userName, 420).toString();
-        var identiconData = new Identicon(comment.userName + "KarenABGGGGGDEREKRKJJJJ", 120).toString();
-        $(newEl).find(".identicon").html('<img width=15 height=15 src="data:image/png;base64,' + identiconData + '">');
-        console.log("KAREN: " + comment.userName + ": " + identiconData);
+        var identiconSize = 20;
+        var options = {
+          foreground:[10, 10, 10, 100], // rgba
+          background:[245, 245, 245, 100], // rgba
+          margin: 0.1, // 10% margin
+          size: identiconSize // identiconSize+px square
+        };
+        var identiconData = new Identicon(thisClass.getHashStrFromString(comment.userName), options).toString();
+        $(newEl).find(".identicon").html('<img width=' + identiconSize + ' height=' + identiconSize + ' src="data:image/png;base64,' + identiconData + '">');
         $(newEl).find(".user_comment_date").html(friendlyDateStrig);
         $(commentBlock).append(newEl);
       }
@@ -747,12 +754,13 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     var hrs = ~~(seconds / 3600);
     var mins = ~~((seconds % 3600) / 60);
     var secs = Math.floor(seconds % 60);
+    // Uncomment to add the "00:" hour by default
     //if (hrs < 1 && mins < 1) {
     //  return secs + "s";
     //}
     if (mins < 10) mins = '0' + mins;
     if (secs < 10) secs = '0' + secs;
-    if (hrs < 1 ) {
+    if (hrs < 1) {
       return mins + ':' + secs;
     }
     if (hrs < 10) hrs = '0' + hrs;
@@ -765,10 +773,30 @@ Class ("paella.plugins.TimedCommentsOverlay", paella.EventDrivenPlugin, {
     return parser.parseFromString(template, "text/html");
     // returns a HTMLDocument, which also is a Document.
   },
+  
+  //By Lukx, June 25, 2013 at 2:16 am
+  //Ref: http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+  getHashStrFromString: function (s) {
+    var hash = 0;
+    if (!s || s.length === 0) {
+      return hash;
+    }
+    for (i = 0; i < s.length; i++) {
+      c = s.charCodeAt(i);
+      hash = ((hash << 5) - hash) + c;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    var hasStr32 = hash.toString();
+    hasStr32 = (Array(33).join(hasStr32) + hasStr32).slice(-32)
+    console.log("KAREN: " + hasStr32 + " length " + hasStr32.length);
+    return hasStr32;
+  },
+  
   // TODO: move these to template files
-  tc_comment: '<div class="tc_comment"><div class="tc_comment_text"></div><div class="identicon"></div><div class="tc_comment_data"><div class="user_name"></div>, <div class="user_comment_date"></div></div></div>',
-  tc_reply: '<div class="tc_comment tc_reply"><div class="tc_comment_text tc_reply_text"></div><div class="identicon"></div><div class="tc_comment_data"><div class="user_name"></div>, <div class="user_comment_date"></div></div></div>',
+  tc_comment: '<div class="tc_comment"><div class="tc_comment_text"></div><div class="identidiv"><div class="identicon"></div><div class="tc_comment_data"><div class="user_name"></div><div class="user_comment_date"></div></div></div></div>',
+  tc_reply: '<div class="tc_comment tc_reply"><div class="tc_comment_text tc_reply_text"></div><div class="identidiv"><div class="identicon"></div><div class="tc_comment_data"><div class="user_name"></div><div class="user_comment_date"></div></div></div></div>',
   tc_reply_box: '<div class="tc_comment tc_reply_box"><form class="tc_new_reply_form" role="form"><input type="text" class="tc_reply_textarea" aria-label="reply text area" placeholder="Type a reply [enter to submit] 256 char" maxlength="256"></input></form></div>',
-  tc_new_comment: '<div class="tc_new_comment"><div id="tc_current_timestamp" class="tc_timestamp"></div><form class="tc_new_comment_form" role="form"><div class="tc_comment tc_comment_box"><input type="text" class="tc_comment_textarea" aria-label="Create a new comment" placeholder="Type new comment at the current time [enter to submit] 256 char" maxlength="256"></input><input type="hidden" id="tc_comment_private_checkbox" value="false" /></div></form></div>'
+  tc_new_comment: '<div class="tc_new_comment"><div id="tc_current_timestamp" class="tc_timestamp"></div><form class="tc_new_comment_form" role="form"><div class="tc_comment tc_comment_box"><input type="text" class="tc_comment_textarea" aria-label="Create a new comment" placeholder="Type new comment at the current time [enter to submit] 256 char" maxlength="256"></input><input type="hidden" id="tc_comment_private_checkbox" value="false" /></div></form></div>',
+  vc_menu: '<div id="vcMenu"><div class="vcMenuButton">Make a note</div><div class="vcMenuButton">Show notes</div></div>'
 });
 paella.plugins.timedCommentsOverlay = new paella.plugins.TimedCommentsOverlay();
